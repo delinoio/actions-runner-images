@@ -42,6 +42,8 @@ Check daily at 02:23 UTC (11:23 KST), on recipe changes, and on manual dispatch.
 
 The manual registry transport check uses deterministic public fixtures on trusted `main` in the same protected environment. It verifies private visibility and both large streamed and small compressed uploads without copying host software or changing image tags. Publication runs perform these same probes before collecting software.
 
+Manual candidate recovery may retry acceptance and promotion without exporting software again. It requires a trusted-main publication run, its public inventory artifact and structured layer descriptors, and the matching private candidate manifest digest. Preserve the original build revision and recipe hash, verify the full container again, and use a freshly pinned official default-OS mapping. Recovery shares the publication concurrency group. Its isolated Docker storage uses a short temporary path to remain within Linux's Unix socket limit.
+
 Record success, waiting-for-release, failure, or unchanged results without credentials or raw host content. Scheduled jobs can be delayed by GitHub. Expired/revoked credentials fail visibly and preserve deployed digests. The initial publishing PAT expires on 2027-01-03; rotate its environment Secret before expiry.
 
 Toolchain publication never updates user Runmoor configuration. The Linux host authenticates and pre-pulls the chosen digest with Docker CLI because current Runmoor image pulls do not forward private registry authentication. Docker kernels, system services, sudo, nested daemons, hardware access, and emulator availability have runtime-specific limits despite matching installed tools.

@@ -4,12 +4,14 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { normalizeReport } from '../lib/source.mjs';
 import { Registry } from '../lib/registry.mjs';
+import { verificationRoot, daemonConfig, daemonReason } from '../lib/verification.mjs';
 import { requireHosted, readJSON, jsonFile, command, invariant, reportFailure, log, childEnvironment, IMAGE } from '../lib/common.mjs';
 const os = process.argv[2];
-const root = path.resolve('.work/verification');
+let root;
 let daemon, daemonExited;
 try {
   requireHosted(os); invariant(process.getuid() === 0, 'ROOT_VERIFICATION_REQUIRED');
+  root = await verificationRoot();
   const candidate = await readJSON('.work/candidate.json');
   await mkdir('.work/control', { recursive: true });
   await cp(process.execPath, '.work/control/node');
@@ -21,16 +23,20 @@ try {
   log('verification_storage', { available, required: Math.ceil(candidate.uncompressed * 1.1 + 2 * 1024 ** 3) });
   invariant(available > candidate.uncompressed * 1.1 + 2 * 1024 ** 3, 'VERIFICATION_DISK_INSUFFICIENT');
   const configPath = path.join(root, 'daemon.json'), socket = path.join(root, 'docker.sock');
-  await jsonFile(configPath, { 'data-root': path.join(root, 'data'), 'exec-root': path.join(root, 'exec'), 'pidfile': path.join(root, 'daemon.pid'), hosts: [`unix://${socket}`], 'storage-driver': 'overlay2', features: { 'containerd-snapshotter': false }, iptables: false, 'ip-masq': false, 'ip-forward': false, bridge: 'none' });
+  await jsonFile(configPath, daemonConfig(root));
   const env = { ...childEnvironment(), DOCKER_HOST: `unix://${socket}`, DOCKER_CONFIG: path.join(root, 'auth') };
   delete env.DOCKER_CONTEXT;
-  daemon = spawn('/usr/bin/dockerd', ['--config-file', configPath], { env, stdio: ['ignore', 'ignore', 'ignore'] });
+  let diagnostic = '', spawnCode = null;
+  daemon = spawn('/usr/bin/dockerd', ['--config-file', configPath], { env, stdio: ['ignore', 'ignore', 'pipe'] });
+  daemon.stderr.on('data', chunk => { diagnostic = (diagnostic + chunk.toString('utf8')).slice(-65536); });
+  daemon.once('error', error => { spawnCode = /^[A-Z]+$/.test(error.code ?? '') ? error.code : 'UNKNOWN'; });
   daemonExited = new Promise(resolve => { daemon.once('error', resolve); daemon.once('exit', resolve); });
   let ready = false;
   for (let attempt = 0; attempt < 60; attempt++) {
     try { await command('/usr/bin/docker', ['info'], { env }); ready = true; break; } catch { if (daemon.exitCode !== null) break; }
     await new Promise(resolve => setTimeout(resolve, 500));
   }
+  if (!ready) log('verification_daemon_failed', { reason: daemonReason(diagnostic), exitCode: daemon.exitCode, spawnCode });
   invariant(ready, 'VERIFICATION_DAEMON_UNAVAILABLE');
   const token = process.env.GHCR_PUBLISH_TOKEN; invariant(token, 'REGISTRY_CREDENTIAL_REQUIRED');
   await command('/usr/bin/docker', ['login', 'ghcr.io', '--username', process.env.GHCR_USERNAME ?? 'kdy1', '--password-stdin'], { env, input: token });
@@ -38,6 +44,7 @@ try {
   await command('/usr/bin/docker', ['pull', '--platform', 'linux/amd64', image], { env });
   const inspected = JSON.parse(await command('/usr/bin/docker', ['image', 'inspect', image], { env }))[0];
   invariant(inspected.Os === 'linux' && inspected.Architecture === 'amd64' && inspected.Config.User === 'runner' && !Object.keys(inspected.Config.Volumes ?? {}).length, 'RUNMOOR_IMAGE_CONFIG_MISMATCH');
+  invariant(inspected.Config.Labels?.['io.delino.runner-images.inventory-sha256'] === candidate.source.inventoryHash && inspected.Config.Labels?.['org.opencontainers.image.revision'] === candidate.source.recipeRevision, 'CANDIDATE_PROVENANCE_MISMATCH');
   const output = path.join(root, 'output'); await mkdir(output, { recursive: true });
   await command('chown', ['1001:1001', output]);
   const sandbox = ['run', '--rm', '--network', 'none', '--env', 'CI=true', '--env', 'INSTALLER_SCRIPT_FOLDER=/usr/local/share/runmoor-image/reporter/installers', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--user', 'runner', '--mount', `type=bind,src=${output},dst=/verification-output`, '--entrypoint', 'pwsh', image];
@@ -58,5 +65,5 @@ finally {
     await Promise.race([daemonExited, new Promise(resolve => setTimeout(resolve, 10_000))]);
     if (daemon.exitCode === null) { daemon.kill('SIGKILL'); await daemonExited; }
   }
-  await rm(path.join(root, 'auth'), { recursive: true, force: true });
+  if (root) await rm(path.join(root, 'auth'), { recursive: true, force: true });
 }

@@ -1,0 +1,124 @@
+name: Verify and publish an existing private candidate
+on:
+  workflow_dispatch:
+    inputs:
+      source_run:
+        description: Completed trusted publication run containing the candidate
+        type: string
+        required: true
+      os:
+        description: Candidates to verify
+        type: choice
+        options: [both, '24.04', '26.04']
+        default: both
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: private-image-publication
+  cancel-in-progress: false
+jobs:
+  test:
+    if: github.repository == 'delinoio/actions-runner-images' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      docs_revision: ${{ steps.docs.outputs.revision }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: npm test
+        env:
+          RUN_DOCKER_TESTS: 'true'
+      - run: bash -n scripts/pull-image.sh scripts/smoke.sh
+      - id: docs
+        run: node scripts/pin-docs.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+  images:
+    needs: test
+    if: github.repository == 'delinoio/actions-runner-images' && github.ref == 'refs/heads/main'
+    environment: registry-publish
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['24.04', '26.04']
+    runs-on: ubuntu-${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      PUBLISH_OS: ${{ matrix.os }}
+      SOURCE_RUN_ID: ${{ inputs.source_run }}
+      RUNNER_DOCS_REVISION: ${{ needs.test.outputs.docs_revision }}
+      GHCR_USERNAME: kdy1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download software metadata only
+        if: inputs.os == 'both' || inputs.os == matrix.os
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: result-ubuntu-${{ matrix.os }}
+          path: .work/original
+          run-id: ${{ inputs.source_run }}
+          github-token: ${{ github.token }}
+      - name: Confirm trusted source and recover private candidate descriptors
+        id: source
+        if: inputs.os == 'both' || inputs.os == matrix.os
+        run: node scripts/prepare-recovery.mjs "$PUBLISH_OS"
+        env:
+          GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Verify existing candidate
+        if: inputs.os == 'both' || inputs.os == matrix.os
+        run: |
+          sudo --preserve-env=GHCR_PUBLISH_TOKEN,GHCR_USERNAME,GITHUB_ACTIONS,GITHUB_REPOSITORY,GITHUB_REF,ImageOS,ImageVersion,RUNNER_ENVIRONMENT \
+            "$(command -v node)" scripts/verify.mjs "$PUBLISH_OS"
+        env:
+          GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+      - name: Promote verified candidate and retain four releases
+        if: inputs.os == 'both' || inputs.os == matrix.os
+        run: |
+          sudo --preserve-env=GHCR_PUBLISH_TOKEN,GHCR_USERNAME,GITHUB_ACTIONS,GITHUB_REPOSITORY,GITHUB_REF,GITHUB_RUN_ID,GITHUB_RUN_ATTEMPT,ImageOS,ImageVersion,RUNNER_ENVIRONMENT \
+            .work/control/node scripts/publish.mjs "$PUBLISH_OS"
+        env:
+          GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+      - name: Record sanitized result
+        if: always() && steps.source.outcome != 'skipped'
+        run: |
+          if test -x .work/control/node; then
+            .work/control/node scripts/record-result.mjs "$PUBLISH_OS"
+          else
+            node scripts/record-result.mjs "$PUBLISH_OS"
+          fi
+        env:
+          JOB_RESULT: ${{ job.status }}
+      - name: Upload version reports only
+        if: always() && steps.source.outcome != 'skipped'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: result-ubuntu-${{ matrix.os }}
+          path: results/*.json
+          if-no-files-found: error
+          retention-days: 30
+  record:
+    needs: [test, images]
+    if: always() && needs.test.result == 'success' && github.repository == 'delinoio/actions-runner-images' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: result-ubuntu-*
+          path: results
+          merge-multiple: true
+      - run: node scripts/update-state.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
