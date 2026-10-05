@@ -6,7 +6,7 @@ import { Registry, MEDIA } from '../lib/registry.mjs';
 import { sha256 } from '../lib/common.mjs';
 
 class FakeRegistry {
-  constructor() { this.uploads = new Map(); this.blobs = new Map(); this.manifests = new Map(); this.next = 0; this.patchCount = 0; this.losePatch = false; this.partialPatch = false; this.loseFinalize = false; this.failAlias = null; this.package = { name: 'actions-runner-images', package_type: 'container', visibility: 'private' }; }
+  constructor() { this.uploads = new Map(); this.blobs = new Map(); this.manifests = new Map(); this.next = 0; this.patchCount = 0; this.losePatch = false; this.partialPatch = false; this.loseFinalize = false; this.failAlias = null; this.failHead = false; this.wrongHead = false; this.package = { name: 'actions-runner-images', package_type: 'container', visibility: 'private' }; }
   response(status, body = null, headers = {}) { return new Response(body === null ? null : (typeof body === 'string' ? body : JSON.stringify(body)), { status, headers }); }
   async fetch(input, options = {}) {
     const url = new URL(input), method = options.method ?? 'GET', pathname = url.pathname;
@@ -42,9 +42,10 @@ class FakeRegistry {
     }
     const blob = pathname.match(/\/blobs\/(sha256:[a-f0-9]{64})$/);
     if (blob) {
+      if (method === 'HEAD' && this.failHead) { this.failHead = false; return this.response(503); }
       const data = this.blobs.get(blob[1]);
       if (!data) return this.response(404);
-      return this.response(200, method === 'HEAD' ? null : data.toString(), { 'Docker-Content-Digest': blob[1], 'Content-Length': String(data.length) });
+      return this.response(200, method === 'HEAD' ? null : data.toString(), { 'Docker-Content-Digest': this.wrongHead ? `sha256:${'c'.repeat(64)}` : blob[1], 'Content-Length': String(data.length) });
     }
     const manifest = pathname.match(/\/manifests\/(.+)$/);
     if (manifest) {
@@ -60,7 +61,7 @@ class FakeRegistry {
     }
     throw new Error(`Unhandled fake route: ${method} ${pathname}`);
   }
-  client() { return new Registry({ token: 'fixture-package-token', fetcher: this.fetch.bind(this), chunkSize: 4 }); }
+  client() { return new Registry({ token: 'fixture-package-token', fetcher: this.fetch.bind(this), chunkSize: 4, verificationDelay: 0 }); }
 }
 test('one streaming request verifies bytes, hash and final registry roundtrip', async () => {
   const server = new FakeRegistry(); const data = Buffer.from('abcdefghijklmnop');
@@ -81,6 +82,16 @@ test('finalization response loss is confirmed through the blob digest', async ()
   const server = new FakeRegistry(); server.loseFinalize = true;
   const data = Buffer.from('abcdefgh'); const descriptor = await server.client().uploadBuffer(data);
   assert.deepEqual(server.blobs.get(descriptor.digest), data);
+});
+test('blob verification retries a transient HEAD failure without uploading again', async () => {
+  const server = new FakeRegistry(); server.failHead = true;
+  const data = Buffer.from('roundtrip-proof'); const descriptor = await server.client().uploadBuffer(data);
+  assert.equal(descriptor.digest, sha256(data)); assert.equal(server.patchCount, 1);
+});
+test('blob verification never accepts a different digest after bounded retries', async () => {
+  const server = new FakeRegistry(); server.wrongHead = true;
+  await assert.rejects(server.client().uploadBuffer(Buffer.from('roundtrip-proof')), /BLOB_ROUNDTRIP_MISMATCH/);
+  assert.equal(server.manifests.size, 0);
 });
 test('private package verification refuses public visibility and repository association', async () => {
   const server = new FakeRegistry(); await server.client().ensurePrivate();
