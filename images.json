@@ -22,13 +22,13 @@
       "published": null,
       "history": [],
       "lastCheck": {
-        "checkedAt": "2026-10-05T16:50:19.557Z",
+        "checkedAt": "2026-10-05T16:55:16.014Z",
         "status": "failed",
         "imageVersion": "20260927.149.1",
         "recipeRevision": "380ad8745688e1ea472de5a1c9f15cd51200c5e4",
         "sourceRevision": "83a4a873ddbd50fe2774940a7a48038447ed3d0c",
         "docsRevision": "b50bb646e0a98aa27143b639a7a12d67f557768a",
-        "code": "VERIFICATION_DISK_INSUFFICIENT",
+        "code": "COMMAND_FAILED",
         "latestError": null,
         "maintenanceError": null
       }
