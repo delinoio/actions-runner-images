@@ -1,0 +1,856 @@
+on:
+  push:
+  schedule:
+  - cron: 0 22 */7 * *
+  workflow_dispatch:
+    inputs:
+      FORCE_UPDATE:
+        type: boolean
+        required: false
+jobs:
+  dump:
+    if: github.event_name != 'schedule' || vars.ENABLE_SCHEDULE == 'true'
+    strategy:
+      matrix:
+        runner:
+        - ubuntu-24.04
+        - ubuntu-26.04
+        - ubuntu-24.04-arm
+        - ubuntu-26.04-arm
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    permissions: write-all
+    env:
+      SUFFIX: -${{ github.run_id }}.${{ github.run_attempt }}
+      UP: |-
+        | tee >(sha256sum | awk '{ print $1 }' > sha.txt) | gzip -9 -c | tee >(sha256sum | awk '{ print $1 }' > sha2.txt) | node script.js
+      FORCE_UPDATE: ${{ inputs.FORCE_UPDATE }}
+    steps:
+    - name: Setup node
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+    - name: Create Script
+      run: |
+        var fs = require("fs");
+        var showProgress = setInterval(() => {
+            console.log("Bytes read: " + process.stdin.bytesRead);
+        }, 5000);
+        (async () => {
+            try {
+                var token = "";
+                const imageName = ${{ github.ref_name == github.event.repository.default_branch && '"runner-images"' || '"runner-images-experiments"' }};
+                var refresh = async () => {
+                  console.log("Authenticate against registry");
+                  var resp = await fetch("https://ghcr.io/token?service=registry.docker.io&scope=repository:${{ github.repository_owner }}/" + imageName + ":pull,push",  { method: "GET", redirect: "manual", credentials: "include", headers: {
+                      "Authorization": "Basic " + btoa("${{ github.actor }}:${{ github.token }}")
+                  } });
+                  console.log(JSON.stringify(resp.status));
+                  token = (await resp.json()).token;
+                }
+                if(process.env.UPLOAD_LAYER) {
+                  console.log("Uploading Layer");
+                  await refresh();
+                  var resp = await fetch("https://ghcr.io/v2/${{ github.repository_owner }}/" + imageName + "/blobs/uploads/", { method: "POST", redirect: "manual", body: "", credentials: "include", headers: {
+                      "Authorization": "Bearer " + token
+                  } });
+                  console.log(JSON.stringify(resp.status));
+                  var location = resp.headers.get("Location");
+                  console.log("NEXT_URL:" + location);
+                  resp = await fetch("https://ghcr.io" + location, { method: "PATCH", redirect: "manual", body: process.stdin, duplex: "half", credentials: "include", headers: {
+                      "Content-Type": "application/octet-stream",
+                      "Authorization": "Bearer " + token
+                  } });
+                  console.log(JSON.stringify(resp.status));
+                  location = resp.headers.get("Location");
+                  console.log("NEXT_URL:" + location);
+                  console.log("Committing Layer");
+                  var commitLayer = async () => {
+                    await refresh();
+                    var url = "https://ghcr.io" + location + "?digest=sha256:" + (await fs.promises.readFile("sha2.txt", { encoding: "utf-8" })).trim();
+                    console.log("url:" + url);
+                    resp = await fetch(url, { method: "PUT", redirect: "manual", duplex: "half", credentials: "include", headers: {
+                        "Content-Type": "application/octet-stream",
+                        "Content-Length": "0",
+                        "Authorization": "Bearer " + token
+                    } });
+                    console.log(JSON.stringify(resp.status));
+                    location = resp.headers.get("Location");
+                    console.log("NEXT_URL:" + location);
+                  };
+                  var finish = false;
+                  var lastException = null;
+                  for(var i = 0; i < 10 && !finish; i++) {
+                    try {
+                      await commitLayer();
+                      finish = true;
+                    } catch(ex) {
+                      lastException = ex;
+                      console.log("Failed to commit to registry, attempt: " + i + " Cause: " + ex.toString());
+                    }
+                  }
+                  if(!finish) {
+                    throw lastException;
+                  }
+                }
+                clearInterval(showProgress);
+
+                var environment = await fs.promises.readFile("/etc/environment", { encoding: "utf-8" });
+                var envMap = {};
+                var envList = [];
+                var trimQuotes = str => {
+                  if(str.startsWith("\"") && str.endsWith("\"")) {
+                    return str.substring(1, str.length - 1);
+                  }
+                  return str;
+                };
+                for(var line of environment.split("\n")) {
+                  if(line.length > 0) {
+                    var i = line.indexOf("=");
+                    var key = line.substring(0, i);
+                    var val = trimQuotes(line.substring(i + 1));
+                    envList.push(key + "=" + val);
+                    envMap[key] = val;
+                  }
+                }
+
+                var arm = ${{ tojson(contains(matrix.runner, 'arm')) }}
+                var archSuffix = (arm ? "-arm64" : "-amd64");
+
+                var friendlyTag = envMap["ImageOS"] && envMap["ImageVersion"] ? envMap["ImageOS"] + "-" + process.env.TAG + "-" + envMap["ImageVersion"] + archSuffix : null;
+                var latestTag = envMap["ImageOS"] && envMap["ImageVersion"] ? envMap["ImageOS"] + "-" + process.env.TAG + "-latest" + archSuffix : null;
+
+                var labels = {
+                  "org.opencontainers.image.authors": ${{ toJson(format('{0}/{1}', github.server_url, github.repository_owner)) }},
+                  "org.opencontainers.image.created": new Date().toISOString(),
+                  "org.opencontainers.image.description": "Dump of the runner image",
+                  "org.opencontainers.image.documentation": ${{ toJson(format('{0}/{1}/tree/{2}', github.server_url, github.repository, github.sha)) }},
+                  "org.opencontainers.image.ref.name": ("ghcr.io/" + ${{ toJson(github.repository_owner) }} + "/" + imageName + "").toLowerCase(),
+                  "org.opencontainers.image.revision": ${{ toJson(github.sha) }},
+                  "org.opencontainers.image.source": ${{ toJson(format('{0}/{1}/tree/{2}', github.server_url, github.repository, github.sha)) }},
+                  "org.opencontainers.image.title": "runner-image" + archSuffix,
+                  "org.opencontainers.image.url": ${{ toJson(format('{0}/{1}/tree/{2}', github.server_url, github.repository, github.sha)) }},
+                  "org.opencontainers.image.vendor": ${{ toJson(github.repository_owner) }},
+                  "org.opencontainers.image.version": friendlyTag
+                };
+
+                var config = {
+                  "created": new Date().toISOString(),
+                  "architecture": arm ? "arm64" : "amd64",
+                  "os": "linux",
+                  "config": {
+                    "Env": envList,
+                    "Entrypoint": null,
+                    "Cmd": [ "bash" ],
+                    "User": process.getuid() + ":" + process.getgid(),
+                    "Labels": labels,
+                  },
+                  "rootfs": {
+                    "type": "layers",
+                    "diff_ids": [],
+                  },
+                  "history": [
+                    {
+                      "created": new Date().toISOString(),
+                      "created_by": "GitHub Actions via streaming the rootfs using tar and nodejs into ghcr.io, GitHub Hosted Runners do not have enough space for docker build / pull itself",
+                      "empty_layer": true,
+                    },
+                  ],
+                };
+                for(var nlabel in labels) {
+                  config.history.push({
+                    "created": new Date().toISOString(),
+                    "created_by": `LABEL ${nlabel}=${labels[nlabel]}`,
+                    "empty_layer": true,
+                  });
+                }
+
+                if(process.env.LAYER_DIFF_IDS) {
+                  var layer_diff_ids = JSON.parse(process.env.LAYER_DIFF_IDS);
+                  var diff_ids = [];
+                  for(var layer_diff_id of layer_diff_ids) {
+                    if(layer_diff_id.diff_id && layer_diff_id.layer) {
+                      diff_ids.push(JSON.parse(layer_diff_id.diff_id));
+                    }
+                  }
+                  config.rootfs.diff_ids = diff_ids.concat(config.rootfs.diff_ids);
+                }
+                if(process.env.UPLOAD_LAYER) {
+                  var diff_id = "sha256:" + (await fs.promises.readFile("sha.txt", { encoding: "utf-8" })).trim();
+                  config.rootfs.diff_ids.push(diff_id);
+                  await fs.promises.appendFile(process.env.GITHUB_OUTPUT, "diff_id=" + JSON.stringify(diff_id) + "\n", { encoding: "utf-8" });
+                }
+
+                var strconfig = JSON.stringify(config);
+                console.log(strconfig);
+                var crypto = require('crypto');
+                var hash = crypto.createHash('sha256').update(strconfig).digest('hex');
+                await refresh();
+                var resp = await fetch("https://ghcr.io/v2/${{ github.repository_owner }}/" + imageName + "/blobs/uploads/", { method: "POST", redirect: "manual", body: "", credentials: "include", headers: {
+                    "Authorization": "Bearer " + token
+                } });
+                console.log(JSON.stringify(resp.status));
+                var location = resp.headers.get("Location");
+                console.log("NEXT_URL:" + location);
+                resp = await fetch("https://ghcr.io" + location, { method: "PATCH", redirect: "manual", body: strconfig, duplex: "half", credentials: "include", headers: {
+                    "Content-Type": "application/octet-stream",
+                    "Authorization": "Bearer " + token
+                } });
+                console.log(JSON.stringify(resp.status));
+                location = resp.headers.get("Location");
+                console.log("NEXT_URL:" + location);
+                await refresh();
+                url = "https://ghcr.io" + location + "?digest=sha256:" + hash;
+                console.log("url:" + url);
+                resp = await fetch(url, { method: "PUT", redirect: "manual", duplex: "half", credentials: "include", headers: {
+                    "Content-Type": "application/octet-stream",
+                    "Content-Length": "0",
+                    "Authorization": "Bearer " + token
+                } });
+                console.log(JSON.stringify(resp.status));
+                location = resp.headers.get("Location");
+                console.log("NEXT_URL:" + location);
+
+                var manifest = {
+                  "schemaVersion": 2,
+                  "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                  "config": {
+                    "mediaType": "application/vnd.docker.container.image.v1+json",
+                    "size": strconfig.length,
+                    "digest": "sha256:" + hash,
+                  },
+                  "layers": [],
+                  "annotations": labels,
+                };
+                if(process.env.LAYER_DIFF_IDS) {
+                  var layer_diff_ids = JSON.parse(process.env.LAYER_DIFF_IDS);
+                  var layers = [];
+                  for(var layer_diff_id of layer_diff_ids) {
+                    if(layer_diff_id.diff_id && layer_diff_id.layer) {
+                      layers.push(JSON.parse(layer_diff_id.layer));
+                    }
+                  }
+                  manifest.layers = layers.concat(manifest.layers);
+                }
+                if(process.env.UPLOAD_LAYER) {
+                  var layer = {
+                    "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                    "size": process.stdin.bytesRead,
+                    "digest": "sha256:" + (await fs.promises.readFile("sha2.txt", { encoding: "utf-8" })).trim()
+                  };
+                  manifest.layers.push(layer);
+                  await fs.promises.appendFile(process.env.GITHUB_OUTPUT, "layer=" + JSON.stringify(layer) + "\n", { encoding: "utf-8" })
+                }
+                var strmanifest = JSON.stringify(manifest);
+                console.log(strmanifest);
+                
+                await refresh();
+                var tag = process.env.TAG + (process.env.SUFFIX || '') + archSuffix;
+                if(envMap["ImageOS"]) {
+                  tag = envMap["ImageOS"] + "-" + tag;
+                }
+                resp = await fetch("https://ghcr.io/v2/${{ github.repository_owner }}/" + imageName + "/manifests/" + tag, { method: "PUT", redirect: "manual", body: strmanifest, duplex: "half", credentials: "include", headers: {
+                    "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
+                    "Authorization": "Bearer " + token
+                } });
+                console.log(JSON.stringify(resp.status));
+
+                var tags = [ tag ];
+
+                if(friendlyTag) {
+                  await refresh();
+                  resp = await fetch("https://ghcr.io/v2/${{ github.repository_owner }}/" + imageName + "/manifests/" + friendlyTag, { method: "GET", redirect: "manual", credentials: "include", headers: {
+                      "Accept": "application/vnd.docker.distribution.manifest.v2+json",
+                      "Authorization": "Bearer " + token
+                  } });
+
+                  if(resp.status < 200 || resp.status > 299 || process.env.FORCE_UPDATE === "true") {
+                  
+                      resp = await fetch("https://ghcr.io/v2/${{ github.repository_owner }}/" + imageName + "/manifests/" + friendlyTag, { method: "PUT", redirect: "manual", body: strmanifest, duplex: "half", credentials: "include", headers: {
+                          "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
+                          "Authorization": "Bearer " + token
+                      } });
+                      console.log(JSON.stringify(resp.status));
+
+                      console.log("Move latest tag forward");
+                      resp = await fetch("https://ghcr.io/v2/${{ github.repository_owner }}/" + imageName + "/manifests/" + latestTag, { method: "PUT", redirect: "manual", body: strmanifest, duplex: "half", credentials: "include", headers: {
+                          "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
+                          "Authorization": "Bearer " + token
+                      } });
+                      console.log(JSON.stringify(resp.status));
+
+                      tags.push(friendlyTag, latestTag);
+                  }
+                }
+
+                fs.appendFileSync("tags-${{ matrix.runner }}.txt", tags.map(t => ("ghcr.io/${{ github.repository_owner }}/" + imageName + ":" + t).toLowerCase()).join("\n") + "\n");
+                
+                process.exitCode = 0;
+            } catch(ex) {
+                console.log(ex);
+                process.exitCode = 1;
+            } finally {
+                clearInterval(showProgress);
+            }
+            process.exit();
+        })()
+      shell: mv {0} script.js
+    - name: Dump Base Image
+      id: baseImage
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /run /run/user /run/user/* --recursion "--exclude=$GITHUB_WORKSPACE" "--exclude=/proc/*" "--exclude=/dev/*" "--exclude=/run" "--exclude=/sys/*" "--exclude=/tmp/*" "--exclude=/opt/*" "--exclude=/var/cache/*" "--exclude=/var/snap" "--exclude=/var/run/*" "--exclude=/var/tmp/*" "--exclude=/var/crash/*" "--exclude=/var/lib/docker/*" "--exclude=/var/lib/apt/lists/*" "--exclude=/usr/local/*/*"  "--exclude=/mnt/*" "--exclude=/snap/*" "--exclude=/boot" "--exclude=/data" "--exclude=/boot" "--exclude=/imagegeneration/installers/*.tar.*" "--exclude=/home/runner/runners" "--exclude=/home/runner/work" "--exclude=/usr/share/dotnet" "--exclude=/etc/skel" "--exclude=/home/runner/.rustup" "--exclude=/home/runner/.cargo" "--exclude=/home/runner/.dotnet" "--exclude=/home/runneradmin" "--exclude=/usr/share/swift" "--exclude=/usr/share/miniconda" "--exclude=/usr/lib/google-cloud-sdk" "--exclude=/usr/lib/jvm" "--exclude=/usr/lib/mono" "--exclude=/usr/lib/gcc" "--exclude=/usr/lib/llvm-*" "--exclude=/usr/lib/firefox" "--exclude=/usr/lib/python3" "--exclude=/etc/apt/apt.conf.d/50command-not-found" "--exclude=/usr/lib/cnf-update-db" "--exclude=/usr/lib/command-not-found" "--exclude=/etc/zsh_command_not_found" "--exclude=/var/lib/command-not-found" "--exclude=/swapfile" / ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-base
+      shell: bash
+    - name: Dump /usr/local
+      id: usr-local
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c "--exclude=/usr/local/lib/android" "--exclude=/usr/local/.ghcup" "--exclude=/usr/local/share/powershell" --no-recursion /usr --recursion /usr/local ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-usr-local
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /opt
+      id: opt
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c "--exclude=/opt/hostedtoolcache" /opt ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-opt
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /opt/hostedtoolcache
+      id: hostedtoolcache
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /opt --recursion /opt/hostedtoolcache ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-hostedtoolcache
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump gcc
+      id: gcc
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/lib --recursion /usr/lib/gcc ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-gcc
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump rust
+      id: rust
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /home /home/runner --recursion /home/runner/.rustup /home/runner/.cargo ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-rust
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /usr/share/dotnet
+      id: dotnet
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /home /home/runner /usr /usr/share --recursion /usr/share/dotnet /home/runner/.dotnet ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-dotnet
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /usr/share/swift
+      id: swift
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/share --recursion /usr/share/swift ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-swift
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /usr/share/miniconda
+      id: miniconda
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/share --recursion /usr/share/miniconda ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-miniconda
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /usr/lib/google-cloud-sdk
+      id: google-cloud-sdk
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/lib --recursion /usr/lib/google-cloud-sdk ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-google-cloud-sdk
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /usr/lib/jvm
+      id: jvm
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/lib --recursion /usr/lib/jvm ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-jvm
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /usr/lib/mono
+      id: mono
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/lib --recursion /usr/lib/mono ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-mono
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump llvm
+      id: llvm
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/lib --recursion /usr/lib/llvm-* ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-llvm
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }}
+          ]
+      shell: bash
+    - name: Dump firefox
+      id: firefox
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/lib --recursion /usr/lib/firefox ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-firefox
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump python3
+      id: python3
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/lib /etc /etc/apt /etc/apt/apt.conf.d /var /var/lib /etc/apt/apt.conf.d/50command-not-found /usr/lib/cnf-update-db /usr/lib/command-not-found /etc/zsh_command_not_found --recursion /usr/lib/python3 /var/lib/command-not-found ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-python3
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Dump android
+      id: android
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/local /usr/local/lib --recursion /usr/local/lib/android ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-usr-android
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }}
+          ]
+      shell: bash
+    - name: Dump haskell
+      id: haskell
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/local --recursion /usr/local/.ghcup ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-usr-haskell
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }}
+          ]
+      shell: bash
+    - name: Dump powershell
+      id: powershell
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c --no-recursion /usr /usr/local /usr/local/share --recursion /usr/local/share/powershell ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-usr-powershell
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }}
+          ]
+      shell: bash
+    - name: Dump /snap
+      id: snap
+      run: |
+        ${{ env.CMD }} || ${{ env.CMD }}
+      env:
+        CMD: sudo tar --ignore-failed-read -C / -c /snap ${{ env.UP }}
+        UPLOAD_LAYER: 1
+        TAG: runner-snap
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-usr-local-opt
+      run: |
+        node script.js
+      env:
+        TAG: runner-usr-local-opt
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-usr-local-opt-snap
+      run: |
+        node script.js
+      env:
+        TAG: runner-usr-local-opt-snap
+        LAYER_LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.snap.outputs) }},
+            ${{ tojson(steps.dotnet.outputs) }},
+            ${{ tojson(steps.swift.outputs) }},
+            ${{ tojson(steps.miniconda.outputs) }},
+            ${{ tojson(steps.google-cloud-sdk.outputs) }},
+            ${{ tojson(steps.jvm.outputs) }},
+            ${{ tojson(steps.mono.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.firefox.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.android.outputs) }},
+            ${{ tojson(steps.haskell.outputs) }},
+            ${{ tojson(steps.powershell.outputs) }},
+            ${{ tojson(steps.hostedtoolcache.outputs) }},
+            ${{ tojson(steps.rust.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-large
+      run: |
+        node script.js
+      env:
+        TAG: runner-large
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.dotnet.outputs) }},
+            ${{ tojson(steps.swift.outputs) }},
+            ${{ tojson(steps.miniconda.outputs) }},
+            ${{ tojson(steps.google-cloud-sdk.outputs) }},
+            ${{ tojson(steps.jvm.outputs) }},
+            ${{ tojson(steps.mono.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.firefox.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.android.outputs) }},
+            ${{ tojson(steps.haskell.outputs) }},
+            ${{ tojson(steps.powershell.outputs) }},
+            ${{ tojson(steps.hostedtoolcache.outputs) }},
+            ${{ tojson(steps.rust.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-powershell
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-powershell
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.powershell.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-haskell
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-haskell
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.haskell.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-dotnet
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-dotnet
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.dotnet.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-rust
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-rust
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.rust.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-swift
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-swift
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.swift.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-firefox
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-firefox
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.firefox.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-google-cloud-sdk
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-google-cloud-sdk
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.google-cloud-sdk.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-miniconda
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-miniconda
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.miniconda.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-hostedtoolcache
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-hostedtoolcache
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.hostedtoolcache.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-mono
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-mono
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.mono.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-android
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-android
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.android.outputs) }}
+          ]
+      shell: bash
+    - name: Upload runner-medium-jvm
+      run: |
+        node script.js
+      env:
+        TAG: runner-medium-jvm
+        LAYER_DIFF_IDS: |
+          [
+            ${{ tojson(steps.baseImage.outputs) }},
+            ${{ tojson(steps.usr-local.outputs) }},
+            ${{ tojson(steps.opt.outputs) }},
+            ${{ tojson(steps.gcc.outputs) }},
+            ${{ tojson(steps.llvm.outputs) }},
+            ${{ tojson(steps.python3.outputs) }},
+            ${{ tojson(steps.jvm.outputs) }}
+          ]
+      shell: bash
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        path: tags-${{ matrix.runner }}.txt
+        name: tags-${{ matrix.runner }}
+  upload-manifests:
+    runs-on: ubuntu-latest
+    if: (!cancelled())
+    needs: dump
+    permissions: write-all
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+    - name: Download All Artifacts
+      uses: actions/download-artifact@v8
+      with:
+        path: tags
+        pattern: tags-*
+        merge-multiple: true
+    - name: Merge tags.txt
+      run: cat tags/*.txt > tags.txt
+    - name: Dump tags
+      run: cat tags.txt
+    - name: Docker Login
+      run: docker login -u ${{ github.actor }} -p ${{ github.token }} ghcr.io
+    - name: Setup node
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+    - run: npm ci
+    - name: Run Merge
+      run: node ./check-composite-up-to-date.mjs
+
+
+
+

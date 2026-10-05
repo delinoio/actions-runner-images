@@ -1,0 +1,9 @@
+{
+  "name": "@delinoio/actions-runner-images",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": { "node": ">=22" },
+  "scripts": { "test": "node --test test/*.test.mjs", "check": "node scripts/check-source.mjs" }
+}

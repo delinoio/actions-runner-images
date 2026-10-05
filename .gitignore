@@ -1,0 +1,9 @@
+.work/
+results/
+node_modules/
+.env
+.env.*
+*.tar
+*.tar.gz
+*.oci
+**/dist/

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "image": "ghcr.io/delinoio/actions-runner-images",
+  "latestOS": null,
+  "images": {
+    "24.04": { "published": null, "history": [], "lastCheck": null },
+    "26.04": { "published": null, "history": [], "lastCheck": null }
+  }
+}

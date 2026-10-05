@@ -1,0 +1,12 @@
+GitHub Actions runner software snapshots
+Copyright 2026 Delino contributors
+
+This repository includes an MIT-licensed exporter reference by ChristopherHX,
+Copyright (c) 2023 ChristopherHX. See third_party/runner-image-blobs/LICENSE.
+
+Image creation retrieves software-report modules from an exact release commit
+of actions/runner-images, under its original MIT license. Adapted modules and
+the upstream license are included in each private image.
+
+Installed operating-system packages and toolchains retain their own licenses
+and notices. This source repository's Apache-2.0 license does not replace them.
