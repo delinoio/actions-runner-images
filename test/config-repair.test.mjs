@@ -35,11 +35,11 @@ test('configuration repair rejects mismatched payloads, provenance, defaults and
 });
 test('the static environment preserves Azure extensions while excluding Azure credentials and configuration', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'runner-image-env-')), file = path.join(root, 'environment');
-  const prior = process.env.AZURE_EXTENSION_DIR; delete process.env.AZURE_EXTENSION_DIR;
   try {
     await writeFile(file, 'PATH=/usr/bin\nAZURE_EXTENSION_DIR="/opt/az/azcliextensions"\nAZURE_CONFIG_DIR=/private\nAZURE_DEVOPS_EXT_PAT=fixture-private-value\n');
-    const environment = await staticEnvironment(file);
+    const environment = await staticEnvironment(file, { PATH: '/usr/bin', AZURE_DEVOPS_EXT_PAT: 'fixture-private-value' });
     assert.ok(environment.includes('AZURE_EXTENSION_DIR=/opt/az/azcliextensions'));
     assert.ok(!environment.some(value => /AZURE_CONFIG_DIR|AZURE_DEVOPS_EXT_PAT|fixture-private-value/.test(value)));
-  } finally { if (prior === undefined) delete process.env.AZURE_EXTENSION_DIR; else process.env.AZURE_EXTENSION_DIR = prior; await rm(root, { recursive: true, force: true }); }
+    await assert.rejects(staticEnvironment(file, { PATH: '/fixture/job/node_modules/.bin:/usr/bin', GITHUB_WORKSPACE: '/fixture/job' }), /JOB_PATH_IN_TOOL_ENVIRONMENT/);
+  } finally { await rm(root, { recursive: true, force: true }); }
 });
