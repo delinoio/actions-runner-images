@@ -12,6 +12,7 @@
 - Keep actions pinned to commit SHAs. Never execute the vendored reference workflow. Do not automatically sync exporter code from upstream.
 - The manual registry transport check may upload only deterministic fixtures through the trusted-main publishing environment; it must not change image tags or export host software.
 - Candidate recovery requires matching trusted-main run metadata, inventory and layer digests. Preserve original build provenance and repeat full acceptance before promotion; serialize it with publication workflows.
+- Keep isolated verification storage under disk-backed `RUNNER_TEMP`, with containerd socket paths below Linux's Unix socket length limit. Never assume `/tmp` has image-sized disk capacity.
 - Run `npm test` and shell syntax checks before committing. The Linux CI additionally runs the Docker fixture. Record actual image acceptance separately from fixture results in CI outputs.
 - Use English for code and comments. Use structured logs with stable event/error codes. Never log tokens, upload URLs, arbitrary environment values, or raw HTTP/child error bodies.
 - Commit intended changes after staging. Do not use `--no-verify`. Every repository-owned `dist` directory is ignored generated output. Track any repository asset of at least 512 KiB with an exact-path Git LFS attribute.

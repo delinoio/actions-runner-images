@@ -73,7 +73,7 @@ jobs:
       - name: Verify existing candidate
         if: inputs.os == 'both' || inputs.os == matrix.os
         run: |
-          sudo --preserve-env=GHCR_PUBLISH_TOKEN,GHCR_USERNAME,GITHUB_ACTIONS,GITHUB_REPOSITORY,GITHUB_REF,ImageOS,ImageVersion,RUNNER_ENVIRONMENT \
+          sudo --preserve-env=GHCR_PUBLISH_TOKEN,GHCR_USERNAME,GITHUB_ACTIONS,GITHUB_REPOSITORY,GITHUB_REF,ImageOS,ImageVersion,RUNNER_ENVIRONMENT,RUNNER_TEMP \
             "$(command -v node)" scripts/verify.mjs "$PUBLISH_OS"
         env:
           GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
