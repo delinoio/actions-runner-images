@@ -6,16 +6,24 @@
     "24.04": {
       "published": null,
       "history": [],
-      "lastCheck": null
+      "lastCheck": {
+        "checkedAt": "2026-10-05T12:15:03.380Z",
+        "status": "failed",
+        "imageVersion": "20260927.320.1",
+        "recipeRevision": "3390f600d7ebe688527f39a7622162c1a765e647",
+        "code": null,
+        "latestError": null,
+        "maintenanceError": null
+      }
     },
     "26.04": {
       "published": null,
       "history": [],
       "lastCheck": {
-        "checkedAt": "2026-10-05T12:12:00.109Z",
-        "status": "cancelled",
+        "checkedAt": "2026-10-05T12:18:18.872Z",
+        "status": "failed",
         "imageVersion": "20260927.149.1",
-        "recipeRevision": "f1a91b4566f3781473f6fa66883cb37dc3fa14bb",
+        "recipeRevision": "3390f600d7ebe688527f39a7622162c1a765e647",
         "code": null,
         "latestError": null,
         "maintenanceError": null
