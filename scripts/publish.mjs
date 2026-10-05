@@ -24,7 +24,7 @@ try {
   const protectedDigests = new Set();
   for (const tag of ['ubuntu-24.04', 'ubuntu-26.04', 'latest']) { const manifest = await registry.getManifest(tag); if (manifest) protectedDigests.add(manifest.digest); }
   try {
-    for (const id of retentionPlan(await registry.versions(), protectedDigests)) { await registry.deleteVersion(id); log('owned_package_version_deleted', { id }); }
+    for (const id of retentionPlan(await registry.versions(), protectedDigests, { os })) { await registry.deleteVersion(id); log('owned_package_version_deleted', { id }); }
   } catch (error) {
     await jsonFile(`results/${ubuntu(os)}.json`, { ...candidate.source, status: 'published', published, maintenanceError: error.code ?? 'RETENTION_FAILED' });
     throw error;

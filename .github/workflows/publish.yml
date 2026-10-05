@@ -31,6 +31,8 @@ jobs:
     if: github.repository == 'delinoio/actions-runner-images' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    outputs:
+      docs_revision: ${{ steps.docs.outputs.revision }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -39,13 +41,15 @@ jobs:
         env:
           RUN_DOCKER_TESTS: 'true'
       - run: bash -n scripts/pull-image.sh scripts/smoke.sh
+      - name: Pin the documented default for both OS jobs
+        id: docs
+        run: node scripts/pin-docs.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
   images:
     needs: test
     if: github.repository == 'delinoio/actions-runner-images' && github.ref == 'refs/heads/main'
     environment: registry-publish
-    concurrency:
-      group: private-ghcr-package
-      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
@@ -55,6 +59,7 @@ jobs:
     env:
       GHCR_USERNAME: kdy1
       PUBLISH_OS: ${{ matrix.os }}
+      RUNNER_DOCS_REVISION: ${{ needs.test.outputs.docs_revision }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

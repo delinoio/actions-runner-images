@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { includePath, partition, recipeFingerprint, imageConfig, SecretDetector } from '../lib/snapshot.mjs';
-import { latestUbuntu, matchingRelease, shouldBuild, normalizeReport, adaptReport } from '../lib/source.mjs';
+import { latestUbuntu, matchingRelease, shouldBuild, normalizeReport, adaptReport, checkSource } from '../lib/source.mjs';
 import { privatePackage, uploadURL } from '../lib/registry.mjs';
 import { compareVersion } from '../lib/common.mjs';
 import { retentionPlan } from '../lib/retention.mjs';
@@ -46,6 +46,24 @@ test('latest mapping follows the documented x64 row and rejects unknown versions
   assert.equal(latestUbuntu('| Ubuntu 26.04 | x64 | `ubuntu-latest` or `ubuntu-26.04` |'), '26.04');
   assert.throws(() => latestUbuntu('| Ubuntu 28.04 | x64 | `ubuntu-latest` or `ubuntu-28.04` |'));
 });
+test('both OS jobs use one pinned README even if official main moves during the run', async () => {
+  const priorDocs = process.env.RUNNER_DOCS_REVISION, priorVersion = process.env.ImageVersion;
+  const pinned = 'a'.repeat(40); process.env.RUNNER_DOCS_REVISION = pinned; process.env.ImageVersion = '20261001.1.1';
+  const github = {
+    async contents(name, revision) {
+      if (name === 'README.md') { assert.equal(revision, pinned); return '| Ubuntu 26.04 | x64 | `ubuntu-latest` or `ubuntu-26.04` |'; }
+      return 'Image Version: 20261001.1.1';
+    },
+    async json(route) {
+      assert.ok(!route.endsWith('/commits/main'), 'OS jobs must not independently resolve a moving main');
+      if (route.includes('/releases?')) return ['24', '26'].map(os => ({ tag_name: `ubuntu${os}/20261001.1`, draft: false, prerelease: false }));
+      return { object: { type: 'commit', sha: 'b'.repeat(40) } };
+    },
+  };
+  try {
+    for (const os of ['24.04', '26.04']) { const result = await checkSource(os, github); assert.equal(result.docsRevision, pinned); assert.equal(result.latestOS, '26.04'); assert.equal(result.available, true); }
+  } finally { if (priorDocs === undefined) delete process.env.RUNNER_DOCS_REVISION; else process.env.RUNNER_DOCS_REVISION = priorDocs; if (priorVersion === undefined) delete process.env.ImageVersion; else process.env.ImageVersion = priorVersion; }
+});
 test('stable source matching excludes prereleases and version downgrades', () => {
   const release = { tag_name: 'ubuntu24/20260927.320', draft: false, prerelease: false };
   assert.equal(matchingRelease([{ ...release, prerelease: true }, release], '24.04', '20260927.320.1'), release);
@@ -79,5 +97,13 @@ test('private package and upload origins fail closed', () => {
 test('retention keeps four per OS including current aliases and ignores unrelated tags', () => {
   const versions = Array.from({ length: 6 }, (_, i) => ({ id: i + 1, name: `digest${i}`, created_at: `2026-10-0${6 - i}T00:00:00Z`, metadata: { container: { tags: [`ubuntu24-2026100${6 - i}.1.1-aaaaaaaaaaaa-${i + 1}-1`] } } }));
   versions.push({ id: 100, name: 'other', metadata: { container: { tags: ['manual'] } } });
-  assert.deepEqual(retentionPlan(versions, new Set(['digest0'])), [5, 6]);
+  const otherOS = versions.slice(0, 6).map(item => ({ ...item, id: item.id + 20, name: `other-${item.name}`, metadata: { container: { tags: item.metadata.container.tags.map(tag => tag.replace('ubuntu24-', 'ubuntu26-')) } } }));
+  assert.deepEqual(retentionPlan([...versions, ...otherOS], new Set(['digest0']), { os: '24.04' }), [5, 6]);
+  assert.throws(() => retentionPlan(versions, new Set()), /UNSUPPORTED_UBUNTU/);
+});
+test('parallel retention cannot remove another OS candidate or the shared bootstrap twice', () => {
+  const versions = ['candidate-ubuntu24-10-1', 'candidate-ubuntu26-10-1', 'bootstrap-private'].map((tag, i) => ({ id: i + 1, name: `digest${i}`, created_at: '2026-01-01T00:00:00Z', metadata: { container: { tags: [tag] } } }));
+  const now = Date.parse('2026-10-05T00:00:00Z');
+  assert.deepEqual(retentionPlan(versions, new Set(), { os: '24.04', now }), [1, 3]);
+  assert.deepEqual(retentionPlan(versions, new Set(), { os: '26.04', now }), [2]);
 });

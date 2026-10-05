@@ -34,11 +34,11 @@ Candidate acceptance requires a private registry roundtrip, valid image configur
 
 Only verified candidates may receive release tags or stable aliases. Before writing aliases, save their previous manifests. Restore existing aliases on a failed multi-tag promotion. GHCR has no multi-tag transaction or individual-tag deletion API: an initial alias with no predecessor, or failed rollback, is an explicitly failed partial promotion of an already verified image. Do not claim success or silently delete a digest still referenced by an alias. The next trusted run reconciles state.
 
-Retain four owned release versions per OS, including protected current aliases. Never delete a version carrying an unrecognized tag. Failed candidate-only versions and the empty bootstrap can be deleted after 24 hours. All registry mutations target this package only.
+Retain four owned release versions per OS, including protected current aliases. Each OS deletes only its own release and candidate versions. Never delete a version carrying an unrecognized tag or any other OS's tag. Failed candidate-only versions and the empty bootstrap can be deleted after 24 hours; Ubuntu 24.04 alone owns shared bootstrap cleanup. All registry mutations target this package only.
 
 ## Scheduling and operations
 
-Check daily at 02:23 UTC (11:23 KST), on recipe changes, and on manual dispatch. Skip unchanged source/recipe pairs. Do not downgrade an OS alias. Serialize publication workflows; let each OS report its own outcome. Actual check-state commits on `image-status` keep the public repository active and do not trigger new publication builds.
+Check daily at 02:23 UTC (11:23 KST), on recipe changes, and on manual dispatch. Skip unchanged source/recipe pairs. Do not downgrade an OS alias. Serialize publication workflows; build OS candidates in parallel and let each OS report its own outcome. Pin one official main README revision before the matrix starts so the jobs share one default-OS decision and only one job can write `latest`. Keep each OS's retention operations separate. Actual check-state commits on `image-status` keep the public repository active and do not trigger new publication builds.
 
 Record success, waiting-for-release, failure, or unchanged results without credentials or raw host content. Scheduled jobs can be delayed by GitHub. Expired/revoked credentials fail visibly and preserve deployed digests. The initial publishing PAT expires on 2027-01-03; rotate its environment Secret before expiry.
 
