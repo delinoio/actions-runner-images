@@ -40,7 +40,7 @@ try {
   invariant(inspected.Os === 'linux' && inspected.Architecture === 'amd64' && inspected.Config.User === 'runner' && !Object.keys(inspected.Config.Volumes ?? {}).length, 'RUNMOOR_IMAGE_CONFIG_MISMATCH');
   const output = path.join(root, 'output'); await mkdir(output, { recursive: true });
   await command('chown', ['1001:1001', output]);
-  const sandbox = ['run', '--rm', '--network', 'none', '--env', 'CI=true', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--user', 'runner', '--mount', `type=bind,src=${output},dst=/verification-output`, '--entrypoint', 'pwsh', image];
+  const sandbox = ['run', '--rm', '--network', 'none', '--env', 'CI=true', '--env', 'INSTALLER_SCRIPT_FOLDER=/usr/local/share/runmoor-image/reporter/installers', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--user', 'runner', '--mount', `type=bind,src=${output},dst=/verification-output`, '--entrypoint', 'pwsh', image];
   await command('/usr/bin/docker', [...sandbox, '-NoLogo', '-NoProfile', '-File', '/usr/local/share/runmoor-image/reporter/docs-gen/Generate-SoftwareReport.ps1', '-OutputDirectory', '/verification-output'], { env, safeEvents: ['report_probe', 'software_report_failed'] });
   const expected = await readJSON('.work/inventory.json');
   const actual = normalizeReport(await readJSON(path.join(output, 'software-report.json')));

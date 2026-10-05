@@ -7,7 +7,7 @@ const os = process.argv[2];
 try {
   requireHosted(os); const check = await readJSON(`results/${ubuntu(os)}.json`);
   invariant(check.build && check.sourceRevision, 'CHECK_REQUIRED');
-  const reporter = path.resolve('.work/reporter'); await prepareReport(check.sourceRevision, reporter);
+  const reporter = path.resolve('.work/reporter'); await prepareReport(check.sourceRevision, reporter, undefined, os);
   const report = normalizeReport(await generateReport(reporter, path.resolve('.work/source-report')));
   const aptPackages = await command('dpkg-query', ['-W', '-f=${binary:Package}\t${Version}\n']);
   const inventory = { report, aptPackages: aptPackages.trim().split('\n').sort() };

@@ -72,6 +72,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+      - name: Verify private package access before collecting software
+        if: steps.source.outputs.build == 'true'
+        run: node scripts/preflight.mjs "$PUBLISH_OS"
+        env:
+          GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
       - name: Collect complete source inventory
         if: steps.source.outputs.build == 'true'
         run: node scripts/collect.mjs "$PUBLISH_OS"
