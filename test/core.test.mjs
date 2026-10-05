@@ -16,6 +16,11 @@ test('snapshot excludes identities and jobs while retaining tool data', () => {
   assert.equal(includePath('/home/runner/.dotnet/corefx/cryptography/x509stores/my/certificate.pfx'), false);
   assert.equal(includePath('/etc/skel/.dotnet/corefx/cryptography/x509stores/my/certificate.pfx'), false);
   assert.equal(includePath('/home/runner/.local/share/pki/private.key'), false);
+  assert.equal(includePath('/etc/skel/.cargo/credentials.toml'), false);
+  assert.equal(includePath('/home/runner/.nuget/NuGet/NuGet.Config'), false);
+  assert.equal(includePath('/home/runner/.local/share/containers/auth.json'), false);
+  assert.equal(includePath('/home/runner/.local/share/pipx/venvs/tool/bin/tool'), true);
+  assert.equal(includePath('/home/runner/.nuget/packages/tool/1.0/tool.dll'), true);
   assert.throws(() => includePath('/usr/../etc/shadow'));
 });
 test('hard links stay together and oversized files fail', () => {
