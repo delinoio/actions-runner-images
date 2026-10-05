@@ -48,7 +48,7 @@ try {
   const packages = await command('/usr/bin/docker', ['run', '--rm', '--network', 'none', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--entrypoint', 'dpkg-query', image, '-W', '-f=${binary:Package}\t${Version}\n'], { env });
   invariant(JSON.stringify(expected.aptPackages) === JSON.stringify(packages.trim().split('\n').sort()), 'APT_INVENTORY_MISMATCH');
   const smoke = await readFile('scripts/smoke.sh');
-  await command('/usr/bin/docker', ['run', '--rm', '-i', '--network', 'none', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--user', 'runner', '--entrypoint', '/bin/bash', image], { env, input: smoke });
+  await command('/usr/bin/docker', ['run', '--rm', '-i', '--network', 'none', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--user', 'runner', '--entrypoint', '/bin/bash', image], { env, input: smoke, safeEvents: ['smoke_probe'] });
   await jsonFile('.work/verified.json', { digest: candidate.digest, verifiedAt: new Date().toISOString(), softwareInventory: 'passed', aptInventory: 'passed', sandboxCompilation: 'passed' });
   log('candidate_verified', { os, digest: candidate.digest });
 } catch (error) { reportFailure(error); process.exitCode = 1; }
