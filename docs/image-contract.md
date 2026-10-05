@@ -28,6 +28,8 @@ Only trusted `main` workflow events may access the `registry-publish` environmen
 
 An initial empty-rootfs manifest establishes the package before software upload. Verify package identity, private visibility, no linked repository, and denied anonymous token-based read access on every publication. Do not add `org.opencontainers.image.source`, use `GITHUB_TOKEN` for package publication, or grant the public repository package Actions/Codespaces access. Package access settings remain separate from public repository access.
 
+Small configuration blob reads may follow GHCR's signed redirect only to `https://pkg-containers.githubusercontent.com`. Never forward the registry bearer or PAT to that origin and reject further redirects. Require a known OCI configuration descriptor, at most 2 MiB, with exact downloaded size and SHA-256 before parsing. Uploads and other authenticated requests continue to reject redirects and remain restricted to this package.
+
 Fork/PR CI uses fixtures without credentials. All actions are SHA-pinned. The vendored MIT exporter is a non-executed reference. Official report modules are fetched only from the matched release commit; unknown probe changes fail closed. Images contain the modules, their license, and the software-version inventory.
 
 ## Validation and promotion

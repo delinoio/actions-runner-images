@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { requireHosted, reportFailure, log, invariant, sha256 } from '../lib/common.mjs';
+import { requireHosted, reportFailure, log, invariant } from '../lib/common.mjs';
 import { Registry } from '../lib/registry.mjs';
 import { exportLayer } from '../lib/snapshot.mjs';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
@@ -22,11 +22,7 @@ try {
   // no-downgrade rule. Verify that actual read path before a large export starts.
   for (const os of ['24.04', '26.04']) {
     const current = await registry.getManifest(`ubuntu-${os}`); if (!current) continue;
-    const response = await registry.request(`blobs/${current.manifest.config.digest}`);
-    invariant(response.ok, 'CURRENT_IMAGE_CONFIG_UNAVAILABLE');
-    const body = Buffer.from(await response.arrayBuffer());
-    invariant(sha256(body) === current.manifest.config.digest && body.length === current.manifest.config.size, 'CURRENT_CONFIG_ROUNDTRIP_MISMATCH');
-    const config = JSON.parse(body);
+    const config = await registry.getConfig(current.manifest.config);
     invariant(config.os === 'linux' && config.architecture === 'amd64' && config.config.User === 'runner' && config.config.Env.some(value => /^ImageVersion=\d+(\.\d+)+$/.test(value)), 'CURRENT_CONFIG_INVALID');
     log('registry_existing_config_verified', { os, digest: current.digest });
   }

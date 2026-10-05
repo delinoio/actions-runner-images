@@ -111,3 +111,32 @@ test('partial initial promotion is reported instead of claiming rollback', async
   const server = new FakeRegistry(), client = server.client(); server.failAlias = 'latest';
   await assert.rejects(client.promote(Buffer.from('{}'), 'immutable', ['ubuntu-24.04', 'latest']), /PROMOTION_ROLLBACK_INCOMPLETE/);
 });
+test('configuration reads verify content digest for both direct and credential-free signed CDN responses', async () => {
+  const data = Buffer.from('{"config":{"Env":["ImageVersion=20260927.1.1"]}}');
+  const descriptor = { mediaType: MEDIA.config, digest: sha256(data), size: data.length };
+  const server = new FakeRegistry(); server.blobs.set(descriptor.digest, data);
+  assert.deepEqual(await server.client().getConfig(descriptor), JSON.parse(data));
+  let redirected = false;
+  const client = new Registry({ token: 'fixture-package-token', fetcher: async (input, options = {}) => {
+    const url = new URL(input);
+    if (url.hostname === 'pkg-containers.githubusercontent.com') {
+      redirected = true; assert.equal(options.headers, undefined); assert.equal(options.redirect, 'error');
+      return new Response(data);
+    }
+    if (url.pathname.includes('/blobs/sha256:')) { assert.equal(options.headers.Authorization, 'Bearer registry-bearer'); assert.equal(options.redirect, 'manual'); return new Response(null, { status: 307, headers: { Location: 'https://pkg-containers.githubusercontent.com/fixture?signature=fixture' } }); }
+    return server.fetch(input, options);
+  } });
+  assert.deepEqual(await client.getConfig(descriptor), JSON.parse(data)); assert.ok(redirected);
+});
+test('configuration reads reject foreign redirects, excessive descriptors and changed content', async () => {
+  const server = new FakeRegistry(), data = Buffer.from('{}');
+  const descriptor = { mediaType: MEDIA.config, digest: sha256(data), size: data.length };
+  const fetcher = async (input, options) => new URL(input).pathname.includes('/blobs/sha256:') ? new Response(null, { status: 307, headers: { Location: 'https://untrusted.example/fixture' } }) : server.fetch(input, options);
+  const client = new Registry({ token: 'fixture-package-token', fetcher });
+  await assert.rejects(client.getConfig(descriptor), /UNTRUSTED_CONFIG_DOWNLOAD_ORIGIN/);
+  await assert.rejects(client.getConfig({ ...descriptor, size: 3 * 1024 * 1024 }), /INVALID_CONFIG_DESCRIPTOR/);
+  server.blobs.set(descriptor.digest, Buffer.from('[]'));
+  await assert.rejects(server.client().getConfig(descriptor), /CONFIG_DIGEST_MISMATCH/);
+  server.blobs.set(descriptor.digest, Buffer.from('{"changed":true}'));
+  await assert.rejects(server.client().getConfig(descriptor), /CONFIG_DOWNLOAD_TOO_LARGE/);
+});

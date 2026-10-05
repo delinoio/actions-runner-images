@@ -11,8 +11,7 @@ try {
   const body = await readFile('.work/manifest.json');
   const alias = `ubuntu-${os}`, current = await registry.getManifest(alias);
   if (current) {
-    const response = await registry.request(`blobs/${current.manifest.config.digest}`); invariant(response.ok, 'CURRENT_IMAGE_CONFIG_UNAVAILABLE');
-    const config = await response.json(); const version = config.config.Env.find(value => value.startsWith('ImageVersion='))?.slice('ImageVersion='.length);
+    const config = await registry.getConfig(current.manifest.config); const version = config.config.Env.find(value => value.startsWith('ImageVersion='))?.slice('ImageVersion='.length);
     invariant(version && compareVersion(candidate.source.imageVersion, version) >= 0, 'REGISTRY_ALIAS_DOWNGRADE');
   }
   const immutable = `${ubuntu(os)}-${candidate.source.imageVersion}-${candidate.source.recipeHash.slice(0, 12)}-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`;
