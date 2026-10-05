@@ -16,6 +16,8 @@ Use the actual fixed-label GitHub-hosted VM and a stable official release matchi
 
 Preserve installed software, all cached versions and completion markers, Android packages and every installed NDK, static tool environment defaults, permissions, links, and component licenses. Preserve mounted `/snap` contents. Preserve known tool-data home directories; do not copy arbitrary home data. Explicit exclusions remove host identities, authentication files, job checkouts, registered runners, virtual filesystems, temporary files, logs, and daemon runtime storage. Stream tar data through credential-value detection, SHA-256, gzip, and bounded registry uploads. Use one streaming PATCH per layer because GHCR rejects consecutive PATCH chunks. Retry transient upload failures by regenerating the affected layer, with at most four attempts and nine minutes per request. Never stage a complete image. Any unreadable/changing source, credential detection, oversized file, or unsupported layer count fails the build.
 
+Preserve Bazelisk's installed-version download caches for runner and root, while excluding Bazel server runtime caches. Set the launcher fallback to the actual Bazel version observed in the source report so offline default execution does not resolve a floating release. Explicit user version choices and project `.bazelversion` files retain priority.
+
 The image account is `runner`, UID/GID 1001. The image declares no Volumes. `/opt/runmoor-runner` is an empty writable runner-only directory so Runmoor preparation cannot replace the toolchain-bearing home directory.
 
 ## Credentials and trust

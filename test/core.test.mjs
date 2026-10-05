@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { includePath, partition, recipeFingerprint, imageConfig, SecretDetector } from '../lib/snapshot.mjs';
+import { includePath, partition, recipeFingerprint, imageConfig, SecretDetector, inventoryEnvironment } from '../lib/snapshot.mjs';
 import { latestUbuntu, matchingRelease, shouldBuild, normalizeReport, adaptReport, checkSource } from '../lib/source.mjs';
 import { privatePackage, uploadURL } from '../lib/registry.mjs';
 import { compareVersion } from '../lib/common.mjs';
@@ -21,7 +21,18 @@ test('snapshot excludes identities and jobs while retaining tool data', () => {
   assert.equal(includePath('/home/runner/.local/share/containers/auth.json'), false);
   assert.equal(includePath('/home/runner/.local/share/pipx/venvs/tool/bin/tool'), true);
   assert.equal(includePath('/home/runner/.nuget/packages/tool/1.0/tool.dll'), true);
+  assert.equal(includePath('/home/runner/.cache/bazelisk/downloads/bazel-9.2.0/bin/bazel'), true);
+  assert.equal(includePath('/root/.cache/bazelisk/downloads/bazel-9.2.0/bin/bazel'), true);
+  assert.equal(includePath('/home/runner/.cache/bazel/server/server.pid.txt'), false);
   assert.throws(() => includePath('/usr/../etc/shadow'));
+});
+test('Bazel fallback uses the reported cached version without overriding project selection', () => {
+  const report = { NodeType: 'HeaderNode', Children: [{ NodeType: 'ToolVersionNode', ToolName: 'Bazel', Version: '9.2.0' }] };
+  const environment = inventoryEnvironment(['PATH=/usr/bin', 'USE_BAZEL_FALLBACK_VERSION=silent:'], report);
+  assert.deepEqual(environment, ['PATH=/usr/bin', 'USE_BAZEL_FALLBACK_VERSION=silent:9.2.0']);
+  assert.ok(!environment.some(value => value.startsWith('USE_BAZEL_VERSION=')));
+  assert.throws(() => inventoryEnvironment([], { Children: [] }), /BAZEL_INVENTORY_VERSION_REQUIRED/);
+  assert.throws(() => inventoryEnvironment([], { Children: [...report.Children, ...report.Children] }), /BAZEL_INVENTORY_VERSION_REQUIRED/);
 });
 test('hard links stay together and oversized files fail', () => {
   const entries = [{ path: '/', directory: true, size: 0 }, { path: '/a', size: 100, links: 2, inode: '1' }, { path: '/b', size: 100, links: 2, inode: '1' }, { path: '/c', size: 200, links: 1 }];
