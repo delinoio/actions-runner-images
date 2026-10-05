@@ -7,12 +7,12 @@
       "published": null,
       "history": [],
       "lastCheck": {
-        "checkedAt": "2026-10-05T14:38:01.771Z",
+        "checkedAt": "2026-10-05T15:30:16.476Z",
         "status": "cancelled",
         "imageVersion": "20260927.320.1",
-        "recipeRevision": "99e8c17540553af40f03f3a9e3becadf824ecc6c",
+        "recipeRevision": "380ad8745688e1ea472de5a1c9f15cd51200c5e4",
         "sourceRevision": "1275e33f5019b02660b81ecc5622fe196211fa89",
-        "docsRevision": "6df43a84a99f76801fac238d7b7ddb2bd5808251",
+        "docsRevision": "b50bb646e0a98aa27143b639a7a12d67f557768a",
         "code": null,
         "latestError": null,
         "maintenanceError": null
@@ -22,13 +22,13 @@
       "published": null,
       "history": [],
       "lastCheck": {
-        "checkedAt": "2026-10-05T14:38:03.789Z",
+        "checkedAt": "2026-10-05T15:30:14.829Z",
         "status": "failed",
         "imageVersion": "20260927.149.1",
-        "recipeRevision": "99e8c17540553af40f03f3a9e3becadf824ecc6c",
+        "recipeRevision": "380ad8745688e1ea472de5a1c9f15cd51200c5e4",
         "sourceRevision": "83a4a873ddbd50fe2774940a7a48038447ed3d0c",
-        "docsRevision": "6df43a84a99f76801fac238d7b7ddb2bd5808251",
-        "code": "UPLOAD_OFFSET_MISMATCH",
+        "docsRevision": "b50bb646e0a98aa27143b639a7a12d67f557768a",
+        "code": "VERIFICATION_DAEMON_UNAVAILABLE",
         "latestError": null,
         "maintenanceError": null
       }
