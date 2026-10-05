@@ -18,6 +18,7 @@ try {
   for (const directory of reclaim) await rm(directory, { recursive: true, force: true });
   await mkdir(root, { recursive: true }); const disk = await statfs(root);
   const available = disk.bavail * disk.bsize;
+  log('verification_storage', { available, required: Math.ceil(candidate.uncompressed * 1.1 + 2 * 1024 ** 3) });
   invariant(available > candidate.uncompressed * 1.1 + 2 * 1024 ** 3, 'VERIFICATION_DISK_INSUFFICIENT');
   const configPath = path.join(root, 'daemon.json'), socket = path.join(root, 'docker.sock');
   await jsonFile(configPath, { 'data-root': path.join(root, 'data'), 'exec-root': path.join(root, 'exec'), 'pidfile': path.join(root, 'daemon.pid'), hosts: [`unix://${socket}`], 'storage-driver': 'overlay2', features: { 'containerd-snapshotter': false }, iptables: false, 'ip-masq': false, 'ip-forward': false, bridge: 'none' });
