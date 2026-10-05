@@ -1,9 +1,25 @@
 {
   "schemaVersion": 1,
   "image": "ghcr.io/delinoio/actions-runner-images",
-  "latestOS": null,
+  "latestOS": "24.04",
   "images": {
-    "24.04": { "published": null, "history": [], "lastCheck": null },
-    "26.04": { "published": null, "history": [], "lastCheck": null }
+    "24.04": {
+      "published": null,
+      "history": [],
+      "lastCheck": null
+    },
+    "26.04": {
+      "published": null,
+      "history": [],
+      "lastCheck": {
+        "checkedAt": "2026-10-05T12:12:00.109Z",
+        "status": "cancelled",
+        "imageVersion": "20260927.149.1",
+        "recipeRevision": "f1a91b4566f3781473f6fa66883cb37dc3fa14bb",
+        "code": null,
+        "latestError": null,
+        "maintenanceError": null
+      }
+    }
   }
 }
