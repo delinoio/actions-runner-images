@@ -10,7 +10,7 @@ import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 
 test('snapshot excludes identities and jobs while retaining tool data', () => {
-  for (const file of ['/etc/shadow', '/etc/ssh/ssh_host_ed25519_key', '/home/runner/work/source/.git/config', '/home/runner/.docker/config.json', '/home/runner/.cargo/credentials.toml', '/var/lib/cloud/instance/user-data.txt', '/proc/self/environ', '/opt/actions-runner/.credentials']) assert.equal(includePath(file), false, file);
+  for (const file of ['/etc/shadow', '/etc/ssh/ssh_host_ed25519_key', '/home/runner/work/source/.git/config', '/home/runner/.docker/config.json', '/home/runner/.cargo/credentials.toml', '/var/lib/cloud/instance/user-data.txt', '/proc/self/environ', '/opt/actions-runner/.credentials', '/etc/apt/auth.conf.d/feed.conf', '/var/lib/ubuntu-advantage/private/machine-token.json', '/imagegeneration/ImageGeneration.log']) assert.equal(includePath(file), false, file);
   for (const file of ['/opt/hostedtoolcache/node/24/x64.complete', '/usr/local/lib/android/sdk/ndk/29/source.properties', '/home/runner/.cargo/bin/rustup', '/etc/skel/.rustup/settings.toml', '/home/linuxbrew/.linuxbrew/Homebrew/.git/HEAD', '/usr/lib/python3/work/module.py', '/home/runner/.docker/cli-plugins/docker-buildx', '/snap/chromium/1/usr/lib/chromium-browser/chrome']) assert.equal(includePath(file), true, file);
   assert.equal(includePath('/usr/local/repository', ['/usr/local/repository']), false);
   assert.throws(() => includePath('/usr/../etc/shadow'));
