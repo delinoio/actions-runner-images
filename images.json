@@ -20,10 +20,10 @@
       "published": null,
       "history": [],
       "lastCheck": {
-        "checkedAt": "2026-10-05T13:14:17.484Z",
-        "status": "failed",
+        "checkedAt": "2026-10-05T13:30:55.344Z",
+        "status": "cancelled",
         "imageVersion": "20260927.149.1",
-        "recipeRevision": "e22e238b1485a92662e15d1ec734408b8b3ce384",
+        "recipeRevision": "89247ced70c46823de4a0530cf8f12cf9055bd72",
         "code": null,
         "latestError": null,
         "maintenanceError": null
