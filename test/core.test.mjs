@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { includePath, partition, recipeFingerprint, imageConfig, SecretDetector } from '../lib/snapshot.mjs';
-import { latestUbuntu, matchingRelease, shouldBuild, normalizeReport } from '../lib/source.mjs';
+import { latestUbuntu, matchingRelease, shouldBuild, normalizeReport, adaptReport } from '../lib/source.mjs';
 import { privatePackage, uploadURL } from '../lib/registry.mjs';
 import { compareVersion } from '../lib/common.mjs';
 import { retentionPlan } from '../lib/retention.mjs';
@@ -51,6 +51,12 @@ test('report normalization preserves versions and table column meaning', () => {
   const make = row => ({ NodeType: 'HeaderNode', Children: [{ NodeType: 'TableNode', Headers: ['Name', 'Version'], Rows: [row] }] });
   assert.notDeepEqual(normalizeReport(make(['Java', '17'])), normalizeReport(make(['17', 'Java'])));
   assert.throws(() => normalizeReport({}), /REPORT_SCHEMA_CHANGED/);
+});
+test('APT report retains multi-version values in one table cell and rejects changed probes', () => {
+  const input = "$version = $version -replace '~','\\~'";
+  const adapted = adaptReport('SoftwareReport.Common.psm1', input);
+  assert.equal(adapted, "$version = (@($version) -join ', ') -replace '~','\\~'");
+  assert.throws(() => adaptReport('SoftwareReport.Common.psm1', 'changed'), /UPSTREAM_APT_VERSION_PROBE_CHANGED/);
 });
 test('private package and upload origins fail closed', () => {
   const metadata = { name: 'actions-runner-images', package_type: 'container', visibility: 'private' };

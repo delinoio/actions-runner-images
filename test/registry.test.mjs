@@ -25,6 +25,7 @@ class FakeRegistry {
       if (!previous) return this.response(404);
       if (method === 'PATCH') {
         this.patchCount++; const bytes = Buffer.from(options.body);
+        assert.equal(options.headers['Content-Range'], `${previous.length}-${previous.length + bytes.length - 1}`);
         const part = this.partialPatch ? bytes.subarray(0, 2) : bytes;
         const next = Buffer.concat([previous, part]); this.uploads.set(id, next);
         if (this.losePatch || this.partialPatch) { this.losePatch = false; this.partialPatch = false; throw new TypeError('uncertain response'); }
