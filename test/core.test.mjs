@@ -58,6 +58,7 @@ test('private package and upload origins fail closed', () => {
   assert.throws(() => privatePackage({ ...metadata, visibility: 'public' }));
   assert.throws(() => privatePackage({ ...metadata, repository: { full_name: 'delinoio/actions-runner-images' } }));
   assert.equal(uploadURL('/v2/delinoio/actions-runner-images/blobs/uploads/1').hostname, 'ghcr.io');
+  assert.equal(uploadURL('/v2/delinoio/actions-runner-images/blobs/upload/1').hostname, 'ghcr.io');
   assert.throws(() => uploadURL('https://other.example/v2/delinoio/actions-runner-images/blobs/uploads/1'));
   assert.throws(() => uploadURL('/v2/delinoio/unrelated/blobs/uploads/1'));
 });
