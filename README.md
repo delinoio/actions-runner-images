@@ -35,6 +35,8 @@ Generated check metadata is committed only to the `image-status` branch so the o
 
 Updates publish new images. You choose when to pull and change Runmoor's digest. A failed build keeps existing deployed versions; inspect the workflow status for failures or versions waiting for an official stable release.
 
+If a complete candidate uploaded but acceptance failed, maintainers can run **Verify and publish an existing private candidate** with the original publication run ID and OS. It repeats full acceptance before promotion and preserves the original build provenance. **Check private registry transport** tests deterministic uploads without exporting software or changing tags.
+
 ## Publisher setup
 
 The `registry-publish` GitHub environment permits `main` only. It needs `GHCR_PUBLISH_TOKEN`, a classic PAT with `write:packages` and `delete:packages`, which implies package read access. Exclude the broad `repo` scope. `GHCR_USERNAME` defaults to `kdy1`.
