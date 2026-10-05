@@ -8,7 +8,7 @@ The supported platforms are Ubuntu 24.04 and 26.04, Linux amd64. Stable aliases 
 
 Release tags have the form `ubuntu24-<ImageVersion>-<recipeHash12>-<runId>-<attempt>` or the corresponding `ubuntu26` form. A release tag is never overwritten. Candidate tags are unique per OS, workflow run, and attempt. Registry retention can delete old immutable releases after four newer successful versions are available for that OS.
 
-`images.json` is generated publication/check metadata. It is excluded from the recipe hash. The pull helper accepts `ubuntu-24.04`, `ubuntu-26.04`, `latest`, or an immutable release tag, pulls through the caller's Docker authentication, and prints a digest-pinned Runmoor configuration fragment. It never changes configuration or starts a daemon.
+`images.json` on the `image-status` branch is generated publication/check metadata. The file on `main` is only its initial schema template. Status updates must not bypass or change the organization's protected-main rules. It is excluded from the recipe hash. The pull helper accepts `ubuntu-24.04`, `ubuntu-26.04`, `latest`, or an immutable release tag, pulls through the caller's Docker authentication, and prints a digest-pinned Runmoor configuration fragment. It never changes configuration or starts a daemon.
 
 ## Source and filesystem
 
@@ -38,7 +38,7 @@ Retain four owned release versions per OS, including protected current aliases. 
 
 ## Scheduling and operations
 
-Check daily at 02:23 UTC (11:23 KST), on recipe changes, and on manual dispatch. Skip unchanged source/recipe pairs. Do not downgrade an OS alias. Serialize publication workflows; let each OS report its own outcome. Actual check-state commits keep the public repository active and do not trigger new publication builds.
+Check daily at 02:23 UTC (11:23 KST), on recipe changes, and on manual dispatch. Skip unchanged source/recipe pairs. Do not downgrade an OS alias. Serialize publication workflows; let each OS report its own outcome. Actual check-state commits on `image-status` keep the public repository active and do not trigger new publication builds.
 
 Record success, waiting-for-release, failure, or unchanged results without credentials or raw host content. Scheduled jobs can be delayed by GitHub. Expired/revoked credentials fail visibly and preserve deployed digests. The initial publishing PAT expires on 2027-01-03; rotate its environment Secret before expiry.
 

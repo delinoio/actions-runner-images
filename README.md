@@ -4,7 +4,7 @@ Private Docker snapshots of the complete GitHub-hosted Ubuntu software inventory
 
 Supported images: Ubuntu 24.04 and 26.04, Linux x86-64. Each includes that OS's installed SDKs, every NDK and toolcache version, languages, Java installations, browsers, and other preinstalled tools. Ubuntu versions have different official inventories.
 
-[Publication status and digests](images.json) · [Workflow runs](https://github.com/delinoio/actions-runner-images/actions)
+[Publication status and digests](https://github.com/delinoio/actions-runner-images/blob/image-status/images.json) · [Workflow runs](https://github.com/delinoio/actions-runner-images/actions)
 
 ## Use with Runmoor
 
@@ -31,7 +31,7 @@ Keep the dedicated runner path. Runmoor replaces that directory during automatic
 
 ## Updates
 
-The workflow checks both fixed Ubuntu labels daily at 11:23 KST, on recipe changes, and on manual dispatch. New source or exporter versions produce private candidates. Verified candidates update their OS alias and receive unique immutable tags. `latest` follows GitHub's documented default Ubuntu OS. Only the most recent four successful versions per OS are retained.
+Generated check metadata is committed only to the `image-status` branch so the organization's protected `main` remains unchanged. The workflow checks both fixed Ubuntu labels daily at 11:23 KST, on recipe changes, and on manual dispatch. New source or exporter versions produce private candidates. Verified candidates update their OS alias and receive unique immutable tags. `latest` follows GitHub's documented default Ubuntu OS. Only the most recent four successful versions per OS are retained.
 
 Updates publish new images. You choose when to pull and change Runmoor's digest. A failed build keeps existing deployed versions; inspect the workflow status for failures or versions waiting for an official stable release.
 

@@ -70,6 +70,7 @@ jobs:
         if: steps.source.outputs.build == 'false'
         run: node scripts/reconcile-latest.mjs "$PUBLISH_OS"
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
       - name: Collect complete source inventory
         if: steps.source.outputs.build == 'true'
