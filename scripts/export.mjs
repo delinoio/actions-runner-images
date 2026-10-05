@@ -12,6 +12,7 @@ try {
   const registry = new Registry(); await registry.ensurePrivate();
   const exclusions = [process.env.GITHUB_WORKSPACE, process.env.RUNNER_TEMP].filter(Boolean);
   const entries = await enumerate('/', exclusions), batches = partition(entries);
+  log('snapshot_planned', { os, files: entries.length, layers: batches.length, estimatedBytes: batches.reduce((sum, batch) => sum + batch.bytes, 0) });
   const secrets = Object.entries(process.env).filter(([key]) => /TOKEN|SECRET|PASSWORD|CREDENTIAL/i.test(key)).map(([, value]) => value);
   const layers = [];
   for (let index = 0; index < batches.length; index++) layers.push(await exportLayer(registry, '/', batches[index], path.resolve('.work/layers'), index, secrets));
