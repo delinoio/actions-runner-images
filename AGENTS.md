@@ -10,6 +10,7 @@
 - GHCR uploads use one streaming PATCH per layer. Retry a transient failure by regenerating that layer, up to four attempts; never resume unsupported multi-PATCH uploads or stage a complete image.
 - Serialize publication workflows, but let OS jobs build in parallel. Pin one official README revision for both jobs so only the documented default OS can write `latest`. Retention deletes only the invoking OS's versions; Ubuntu 24.04 alone owns empty-bootstrap cleanup.
 - Keep actions pinned to commit SHAs. Never execute the vendored reference workflow. Do not automatically sync exporter code from upstream.
+- The manual registry transport check may upload only deterministic fixtures through the trusted-main publishing environment; it must not change image tags or export host software.
 - Run `npm test` and shell syntax checks before committing. The Linux CI additionally runs the Docker fixture. Record actual image acceptance separately from fixture results in CI outputs.
 - Use English for code and comments. Use structured logs with stable event/error codes. Never log tokens, upload URLs, arbitrary environment values, or raw HTTP/child error bodies.
 - Commit intended changes after staging. Do not use `--no-verify`. Every repository-owned `dist` directory is ignored generated output. Track any repository asset of at least 512 KiB with an exact-path Git LFS attribute.

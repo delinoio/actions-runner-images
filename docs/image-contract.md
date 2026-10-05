@@ -40,6 +40,8 @@ Retain four owned release versions per OS, including protected current aliases. 
 
 Check daily at 02:23 UTC (11:23 KST), on recipe changes, and on manual dispatch. Skip unchanged source/recipe pairs. Do not downgrade an OS alias. Serialize publication workflows; build OS candidates in parallel and let each OS report its own outcome. Pin one official main README revision before the matrix starts so the jobs share one default-OS decision and only one job can write `latest`. Keep each OS's retention operations separate. Actual check-state commits on `image-status` keep the public repository active and do not trigger new publication builds.
 
+The manual registry transport check uses deterministic public fixtures on trusted `main` in the same protected environment. It verifies private visibility and both large streamed and small compressed uploads without copying host software or changing image tags. Publication runs perform these same probes before collecting software.
+
 Record success, waiting-for-release, failure, or unchanged results without credentials or raw host content. Scheduled jobs can be delayed by GitHub. Expired/revoked credentials fail visibly and preserve deployed digests. The initial publishing PAT expires on 2027-01-03; rotate its environment Secret before expiry.
 
 Toolchain publication never updates user Runmoor configuration. The Linux host authenticates and pre-pulls the chosen digest with Docker CLI because current Runmoor image pulls do not forward private registry authentication. Docker kernels, system services, sudo, nested daemons, hardware access, and emulator availability have runtime-specific limits despite matching installed tools.

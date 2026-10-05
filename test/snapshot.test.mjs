@@ -14,6 +14,24 @@ class MemoryRegistry {
   blobs = new Map();
   async uploadStream(stream) { const data = []; for await (const chunk of stream) data.push(chunk); const body = Buffer.concat(data), digest = sha256(body); this.blobs.set(digest, body); return { digest, size: body.length }; }
 }
+test('small compressor output survives delayed upload creation', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'runner-image-small-')), work = await mkdtemp(path.join(tmpdir(), 'runner-image-small-work-'));
+  const previousTar = process.env.TAR, previousEnvironment = process.env.RUNNER_ENVIRONMENT;
+  process.env.TAR = process.platform === 'darwin' ? 'gtar' : 'tar';
+  if (process.platform === 'linux') process.env.RUNNER_ENVIRONMENT = 'github-hosted';
+  try {
+    await writeFile(path.join(root, 'proof.txt'), 'small-archive-proof');
+    const registry = new MemoryRegistry(), upload = registry.uploadStream.bind(registry);
+    registry.uploadStream = async stream => { await new Promise(resolve => setTimeout(resolve, 250)); return upload(stream); };
+    const layer = await exportLayer(registry, root, { files: ['proof.txt'] }, work, 0);
+    const raw = gunzipSync(registry.blobs.get(layer.digest));
+    assert.ok(raw.includes(Buffer.from('small-archive-proof'))); assert.equal(sha256(raw), layer.diff_id);
+  } finally {
+    if (previousTar) process.env.TAR = previousTar; else delete process.env.TAR;
+    if (previousEnvironment) process.env.RUNNER_ENVIRONMENT = previousEnvironment; else delete process.env.RUNNER_ENVIRONMENT;
+    await rm(root, { recursive: true, force: true }); await rm(work, { recursive: true, force: true });
+  }
+});
 test('a transient layer upload regenerates the archive without staging it', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'runner-image-retry-')), work = await mkdtemp(path.join(tmpdir(), 'runner-image-retry-work-'));
   const previous = process.env.TAR; process.env.TAR = process.platform === 'darwin' ? 'gtar' : 'tar';

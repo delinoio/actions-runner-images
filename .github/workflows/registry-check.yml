@@ -1,0 +1,19 @@
+name: Check private registry transport
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    if: github.repository == 'delinoio/actions-runner-images' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: registry-publish
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: node scripts/preflight.mjs 24.04
+        env:
+          GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+          GHCR_USERNAME: kdy1
