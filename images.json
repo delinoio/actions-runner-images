@@ -7,10 +7,10 @@
       "published": null,
       "history": [],
       "lastCheck": {
-        "checkedAt": "2026-10-05T12:15:03.380Z",
+        "checkedAt": "2026-10-05T12:58:53.630Z",
         "status": "failed",
         "imageVersion": "20260927.320.1",
-        "recipeRevision": "3390f600d7ebe688527f39a7622162c1a765e647",
+        "recipeRevision": "bbb8843046aec35792812ee5de506def5135d675",
         "code": null,
         "latestError": null,
         "maintenanceError": null
@@ -20,10 +20,10 @@
       "published": null,
       "history": [],
       "lastCheck": {
-        "checkedAt": "2026-10-05T12:18:18.872Z",
+        "checkedAt": "2026-10-05T12:58:41.018Z",
         "status": "failed",
         "imageVersion": "20260927.149.1",
-        "recipeRevision": "3390f600d7ebe688527f39a7622162c1a765e647",
+        "recipeRevision": "bbb8843046aec35792812ee5de506def5135d675",
         "code": null,
         "latestError": null,
         "maintenanceError": null
