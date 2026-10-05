@@ -11,6 +11,10 @@ on:
         type: choice
         options: [both, '24.04', '26.04']
         default: both
+      restore_azure_extension_default:
+        description: Restore the missing Azure extension lookup default without changing filesystem layers
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: read
@@ -73,10 +77,11 @@ jobs:
       - name: Verify existing candidate
         if: inputs.os == 'both' || inputs.os == matrix.os
         run: |
-          sudo --preserve-env=GHCR_PUBLISH_TOKEN,GHCR_USERNAME,GITHUB_ACTIONS,GITHUB_REPOSITORY,GITHUB_REF,ImageOS,ImageVersion,RUNNER_ENVIRONMENT,RUNNER_TEMP \
+          sudo --preserve-env=GHCR_PUBLISH_TOKEN,GHCR_USERNAME,GITHUB_ACTIONS,GITHUB_REPOSITORY,GITHUB_REF,GITHUB_SHA,GITHUB_RUN_ID,GITHUB_RUN_ATTEMPT,ImageOS,ImageVersion,RUNNER_ENVIRONMENT,RUNNER_TEMP,RESTORE_AZURE_EXTENSION_DEFAULT \
             "$(command -v node)" scripts/verify.mjs "$PUBLISH_OS"
         env:
           GHCR_PUBLISH_TOKEN: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+          RESTORE_AZURE_EXTENSION_DEFAULT: ${{ inputs.restore_azure_extension_default }}
       - name: Promote verified candidate and retain four releases
         if: inputs.os == 'both' || inputs.os == matrix.os
         run: |

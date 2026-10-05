@@ -18,7 +18,7 @@ try {
   const immutable = `${ubuntu(os)}-${candidate.source.imageVersion}-${candidate.source.recipeHash.slice(0, 12)}-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`;
   const aliases = candidate.source.latestOS === os ? [alias, 'latest'] : [alias];
   const digest = await registry.promote(body, immutable, aliases);
-  const published = { imageVersion: candidate.source.imageVersion, recipeHash: candidate.source.recipeHash, recipeRevision: candidate.source.recipeRevision, sourceRevision: candidate.source.sourceRevision, releaseTag: candidate.source.releaseTag, inventoryHash: candidate.source.inventoryHash, digest, ref: `${IMAGE}@${digest}`, tag: immutable, publishedAt: new Date().toISOString(), validation: verified, layers: candidate.layers.map(({ digest, size, uncompressed }) => ({ digest, size, uncompressed })) };
+  const published = { imageVersion: candidate.source.imageVersion, recipeHash: candidate.source.recipeHash, recipeRevision: candidate.source.recipeRevision, sourceRevision: candidate.source.sourceRevision, releaseTag: candidate.source.releaseTag, inventoryHash: candidate.source.inventoryHash, configurationRepair: candidate.source.configurationRepair ?? null, digest, ref: `${IMAGE}@${digest}`, tag: immutable, publishedAt: new Date().toISOString(), validation: verified, layers: candidate.layers.map(({ digest, size, uncompressed }) => ({ digest, size, uncompressed })) };
   // Persist publication acceptance before cleanup: a retention error must not erase a successful promotion.
   await jsonFile(`results/${ubuntu(os)}.json`, { ...candidate.source, status: 'published', published });
   const protectedDigests = new Set();

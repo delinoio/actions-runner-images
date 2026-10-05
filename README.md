@@ -37,6 +37,8 @@ Updates publish new images. You choose when to pull and change Runmoor's digest.
 
 If a complete candidate uploaded but acceptance failed, maintainers can run **Verify and publish an existing private candidate** with the original publication run ID and OS. It repeats full acceptance before promotion and preserves the original build provenance. **Check private registry transport** tests deterministic uploads without exporting software or changing tags.
 
+For older candidates missing the Azure extension lookup default, the recovery workflow has an explicit restoration option. It keeps the filesystem layers, records the separate configuration revision, and repeats all acceptance checks.
+
 ## Publisher setup
 
 The `registry-publish` GitHub environment permits `main` only. It needs `GHCR_PUBLISH_TOKEN`, a classic PAT with `write:packages` and `delete:packages`, which implies package read access. Exclude the broad `repo` scope. `GHCR_USERNAME` defaults to `kdy1`.

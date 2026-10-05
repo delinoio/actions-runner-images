@@ -18,6 +18,8 @@ Preserve installed software, all cached versions and completion markers, Android
 
 Preserve Bazelisk's installed-version download caches for runner and root, while excluding Bazel server runtime caches. Set the launcher fallback to the actual Bazel version observed in the source report so offline default execution does not resolve a floating release. Explicit user version choices and project `.bazelversion` files retain priority.
 
+Preserve `AZURE_EXTENSION_DIR` for the installed Azure CLI extensions. Azure authentication/configuration directories and credential environment variables remain excluded.
+
 The image account is `runner`, UID/GID 1001. The image declares no Volumes. `/opt/runmoor-runner` is an empty writable runner-only directory so Runmoor preparation cannot replace the toolchain-bearing home directory.
 
 ## Credentials and trust
@@ -45,6 +47,8 @@ Check daily at 02:23 UTC (11:23 KST), on recipe changes, and on manual dispatch.
 The manual registry transport check uses deterministic public fixtures on trusted `main` in the same protected environment. It verifies private visibility and both large streamed and small compressed uploads without copying host software or changing image tags. Publication runs perform these same probes before collecting software.
 
 Manual candidate recovery may retry acceptance and promotion without exporting software again. It requires a trusted-main publication run, its public inventory artifact and structured layer descriptors, and the matching private candidate manifest digest. Preserve the original build revision and recipe hash, verify the full container again, and use a freshly pinned official default-OS mapping. Recovery shares the publication concurrency group. Its isolated Docker storage uses a short directory under disk-backed `RUNNER_TEMP` to remain within Linux's Unix socket limit; `/tmp` may be a small memory filesystem.
+
+The explicit `restore_azure_extension_default` recovery option addresses older candidates whose installed Azure extensions were preserved but their lookup variable was omitted. It may add only `AZURE_EXTENSION_DIR=/opt/az/azcliextensions`, confirmed against the same-version hosted VM. It rejects existing conflicting defaults, mismatched layer diff IDs, or changed provenance. Upload a new configuration and private candidate manifest with identical filesystem layers, keep the original build revision/hash, and record the configuration revision and original digest separately. Pull that digest and repeat the entire software/package/compilation acceptance before promotion. This option cannot repair missing payloads or change arbitrary configuration; remove it after the affected candidates expire.
 
 Record success, waiting-for-release, failure, or unchanged results without credentials or raw host content. Scheduled jobs can be delayed by GitHub. Expired/revoked credentials fail visibly and preserve deployed digests. The initial publishing PAT expires on 2027-01-03; rotate its environment Secret before expiry.
 

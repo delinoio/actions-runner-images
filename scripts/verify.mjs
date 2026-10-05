@@ -5,7 +5,9 @@ import { spawn } from 'node:child_process';
 import { normalizeReport } from '../lib/source.mjs';
 import { Registry } from '../lib/registry.mjs';
 import { verificationRoot, daemonConfig, daemonReason } from '../lib/verification.mjs';
-import { requireHosted, readJSON, jsonFile, command, invariant, reportFailure, log, childEnvironment, IMAGE } from '../lib/common.mjs';
+import { staticEnvironment } from '../lib/snapshot.mjs';
+import { restoreAzureExtensionDefault } from '../lib/config-repair.mjs';
+import { requireHosted, readJSON, jsonFile, command, invariant, reportFailure, log, childEnvironment, IMAGE, ubuntu } from '../lib/common.mjs';
 const os = process.argv[2];
 let root;
 let daemon, daemonExited;
@@ -40,11 +42,28 @@ try {
   invariant(ready, 'VERIFICATION_DAEMON_UNAVAILABLE');
   const token = process.env.GHCR_PUBLISH_TOKEN; invariant(token, 'REGISTRY_CREDENTIAL_REQUIRED');
   await command('/usr/bin/docker', ['login', 'ghcr.io', '--username', process.env.GHCR_USERNAME ?? 'kdy1', '--password-stdin'], { env, input: token });
-  const image = `${IMAGE}@${candidate.digest}`;
+  let image = `${IMAGE}@${candidate.digest}`;
   await command('/usr/bin/docker', ['pull', '--platform', 'linux/amd64', image], { env });
   const inspected = JSON.parse(await command('/usr/bin/docker', ['image', 'inspect', image], { env }))[0];
   invariant(inspected.Os === 'linux' && inspected.Architecture === 'amd64' && inspected.Config.User === 'runner' && !Object.keys(inspected.Config.Volumes ?? {}).length, 'RUNMOOR_IMAGE_CONFIG_MISMATCH');
   invariant(inspected.Config.Labels?.['io.delino.runner-images.inventory-sha256'] === candidate.source.inventoryHash && inspected.Config.Labels?.['org.opencontainers.image.revision'] === candidate.source.recipeRevision, 'CANDIDATE_PROVENANCE_MISMATCH');
+  if (process.env.RESTORE_AZURE_EXTENSION_DEFAULT === 'true') {
+    const repair = restoreAzureExtensionDefault(inspected, candidate, await staticEnvironment(), process.env.GITHUB_SHA);
+    if (repair) {
+      const registry = new Registry(); await registry.ensurePrivate();
+      const manifest = await readJSON('.work/manifest.json');
+      manifest.config = { ...manifest.config, ...await registry.uploadBuffer(Buffer.from(JSON.stringify(repair.config))) };
+      const body = Buffer.from(JSON.stringify(manifest));
+      invariant(/^\d+$/.test(process.env.GITHUB_RUN_ID ?? '') && /^\d+$/.test(process.env.GITHUB_RUN_ATTEMPT ?? ''), 'CONFIGURATION_REPAIR_RUN_REQUIRED');
+      candidate.candidate = `candidate-${ubuntu(os)}-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`;
+      candidate.digest = await registry.putManifest(candidate.candidate, body);
+      candidate.source.configurationRepair = repair.configurationRepair;
+      await jsonFile('.work/candidate.json', candidate); await writeFile('.work/manifest.json', body);
+      image = `${IMAGE}@${candidate.digest}`;
+      await command('/usr/bin/docker', ['pull', '--platform', 'linux/amd64', image], { env });
+      log('candidate_configuration_repaired', { os, digest: candidate.digest, originalDigest: repair.configurationRepair.originalDigest, revision: repair.configurationRepair.revision });
+    }
+  }
   const output = path.join(root, 'output'); await mkdir(output, { recursive: true });
   await command('chown', ['1001:1001', output]);
   const sandbox = ['run', '--rm', '--network', 'none', '--env', 'CI=true', '--env', 'INSTALLER_SCRIPT_FOLDER=/usr/local/share/runmoor-image/reporter/installers', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--user', 'runner', '--mount', `type=bind,src=${output},dst=/verification-output`, '--entrypoint', 'pwsh', image];
