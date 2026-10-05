@@ -1,19 +1,33 @@
 // SPDX-License-Identifier: Apache-2.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile, chmod, link, symlink, lstat, rm, cp } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, chmod, link, symlink, lstat, rm, cp, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createServer } from 'node:http';
 import { gunzipSync } from 'node:zlib';
 import { enumerate, partition, exportLayer, imageConfig } from '../lib/snapshot.mjs';
-import { command, sha256 } from '../lib/common.mjs';
+import { command, sha256, Failure } from '../lib/common.mjs';
 import { MEDIA } from '../lib/registry.mjs';
 
 class MemoryRegistry {
   blobs = new Map();
   async uploadStream(stream) { const data = []; for await (const chunk of stream) data.push(chunk); const body = Buffer.concat(data), digest = sha256(body); this.blobs.set(digest, body); return { digest, size: body.length }; }
 }
+test('a transient layer upload regenerates the archive without staging it', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'runner-image-retry-')), work = await mkdtemp(path.join(tmpdir(), 'runner-image-retry-work-'));
+  const previous = process.env.TAR; process.env.TAR = process.platform === 'darwin' ? 'gtar' : 'tar';
+  try {
+    await writeFile(path.join(root, 'proof.txt'), 'retry-proof');
+    const registry = new MemoryRegistry(); let attempts = 0;
+    const upload = registry.uploadStream.bind(registry);
+    registry.uploadStream = async stream => { if (++attempts === 1) { for await (const ignored of stream) {} throw new Failure('REGISTRY_REQUEST_FAILED'); } return upload(stream); };
+    const layer = await exportLayer(registry, root, partition(await enumerate(root))[0], work, 0);
+    assert.equal(attempts, 2);
+    assert.ok(gunzipSync(registry.blobs.get(layer.digest)).includes(Buffer.from('retry-proof')));
+    assert.deepEqual(await readdir(work), ['layer-0.files']);
+  } finally { if (previous) process.env.TAR = previous; else delete process.env.TAR; await rm(root, { recursive: true, force: true }); await rm(work, { recursive: true, force: true }); }
+});
 test('GNU tar preserves executable modes, symlinks, hardlinks and completion markers', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'runner-image-fixture-')); const work = await mkdtemp(path.join(tmpdir(), 'runner-image-tar-'));
   const tar = process.platform === 'darwin' ? 'gtar' : 'tar'; const previous = process.env.TAR; process.env.TAR = tar;

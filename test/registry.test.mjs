@@ -24,8 +24,9 @@ class FakeRegistry {
       const id = upload[1], previous = this.uploads.get(id);
       if (!previous) return this.response(404);
       if (method === 'PATCH') {
-        this.patchCount++; const bytes = Buffer.from(options.body);
-        assert.equal(options.headers['Content-Range'], `${previous.length}-${previous.length + bytes.length - 1}`);
+        this.patchCount++; assert.equal(options.duplex, 'half');
+        const chunks = []; for await (const chunk of options.body) chunks.push(Buffer.from(chunk));
+        const bytes = Buffer.concat(chunks);
         const part = this.partialPatch ? bytes.subarray(0, 2) : bytes;
         const next = Buffer.concat([previous, part]); this.uploads.set(id, next);
         if (this.losePatch || this.partialPatch) { this.losePatch = false; this.partialPatch = false; throw new TypeError('uncertain response'); }
@@ -61,20 +62,20 @@ class FakeRegistry {
   }
   client() { return new Registry({ token: 'fixture-package-token', fetcher: this.fetch.bind(this), chunkSize: 4 }); }
 }
-test('chunked uploads verify bytes, hash and final registry roundtrip', async () => {
+test('one streaming request verifies bytes, hash and final registry roundtrip', async () => {
   const server = new FakeRegistry(); const data = Buffer.from('abcdefghijklmnop');
   const blob = await server.client().uploadStream(Readable.from([data.subarray(0, 7), data.subarray(7)]));
-  assert.deepEqual(blob, { digest: sha256(data), size: data.length }); assert.equal(server.patchCount, 4);
+  assert.deepEqual(blob, { digest: sha256(data), size: data.length }); assert.equal(server.patchCount, 1);
 });
-test('PATCH response loss reconciles the offset without duplicate bytes', async () => {
+test('PATCH response loss retries in a fresh upload without duplicate bytes', async () => {
   const server = new FakeRegistry(); server.losePatch = true;
   const data = Buffer.from('abcdefghijkl'); const descriptor = await server.client().uploadBuffer(data);
-  assert.deepEqual(server.blobs.get(descriptor.digest), data); assert.equal(server.patchCount, 3);
+  assert.deepEqual(server.blobs.get(descriptor.digest), data); assert.equal(server.patchCount, 2);
 });
-test('partly accepted PATCH resumes only the remaining bytes', async () => {
+test('partly accepted PATCH restarts the complete payload', async () => {
   const server = new FakeRegistry(); server.partialPatch = true;
   const data = Buffer.from('abcdefgh'); const descriptor = await server.client().uploadBuffer(data);
-  assert.deepEqual(server.blobs.get(descriptor.digest), data); assert.equal(server.patchCount, 3);
+  assert.deepEqual(server.blobs.get(descriptor.digest), data); assert.equal(server.patchCount, 2);
 });
 test('finalization response loss is confirmed through the blob digest', async () => {
   const server = new FakeRegistry(); server.loseFinalize = true;
