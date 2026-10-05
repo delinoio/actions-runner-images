@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, readFile, chmod, link, symlink, lstat, rm, cp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
+import { createServer } from 'node:http';
 import { gunzipSync } from 'node:zlib';
 import { enumerate, partition, exportLayer, imageConfig } from '../lib/snapshot.mjs';
 import { command, sha256 } from '../lib/common.mjs';
@@ -36,7 +36,7 @@ test('GNU tar preserves executable modes, symlinks, hardlinks and completion mar
 });
 
 test('exported OCI layers load into Docker and run with Runmoor sandbox restrictions', { skip: process.env.RUN_DOCKER_TESTS !== 'true' || process.platform !== 'linux' }, async () => {
-  const work = await mkdtemp(path.join(tmpdir(), 'runner-image-docker-')), root = path.join(work, 'root'); const tag = `runner-image-fixture:${process.pid}`;
+  const work = await mkdtemp(path.join(tmpdir(), 'runner-image-docker-')), root = path.join(work, 'root'); let tag, server;
   try {
     await mkdir(root);
     const binaries = ['/bin/sh', '/usr/bin/id', '/usr/bin/stat', '/bin/cat']; const dependencies = new Set();
@@ -53,12 +53,20 @@ test('exported OCI layers load into Docker and run with Runmoor sandbox restrict
     const configDigest = sha256(configBody); registry.blobs.set(configDigest, configBody);
     const manifest = Buffer.from(JSON.stringify({ schemaVersion: 2, mediaType: MEDIA.manifest, config: { mediaType: MEDIA.config, digest: configDigest, size: configBody.length }, layers: layers.map(({ digest, size, mediaType }) => ({ digest, size, mediaType })) }));
     const digest = sha256(manifest); registry.blobs.set(digest, manifest);
-    const layout = path.join(work, 'oci'); await mkdir(path.join(layout, 'blobs/sha256'), { recursive: true });
-    for (const [hash, blob] of registry.blobs) await writeFile(path.join(layout, 'blobs/sha256', hash.slice(7)), blob);
-    await writeFile(path.join(layout, 'oci-layout'), JSON.stringify({ imageLayoutVersion: '1.0.0' }));
-    await writeFile(path.join(layout, 'index.json'), JSON.stringify({ schemaVersion: 2, manifests: [{ mediaType: MEDIA.manifest, digest, size: manifest.length, annotations: { 'org.opencontainers.image.ref.name': tag } }] }));
-    const archive = path.join(work, 'image.tar'); await command('tar', ['-cf', archive, '-C', layout, '.']); await command('docker', ['load', '-i', archive]);
+    server = createServer((request, response) => {
+      const url = new URL(request.url, 'http://127.0.0.1');
+      if (url.pathname === '/v2/' || url.pathname === '/v2') { response.writeHead(200, { 'Docker-Distribution-API-Version': 'registry/2.0' }); response.end(); return; }
+      let body, type;
+      if (url.pathname.startsWith('/v2/fixture/manifests/')) { body = manifest; type = MEDIA.manifest; }
+      else if (url.pathname.startsWith('/v2/fixture/blobs/')) { body = registry.blobs.get(url.pathname.split('/').at(-1)); type = 'application/octet-stream'; }
+      if (!body) { response.writeHead(404); response.end(); return; }
+      response.writeHead(200, { 'Content-Type': type, 'Content-Length': body.length, 'Docker-Content-Digest': sha256(body) });
+      response.end(request.method === 'HEAD' ? undefined : body);
+    });
+    await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    tag = `127.0.0.1:${server.address().port}/fixture:acceptance`;
+    await command('docker', ['pull', '--platform', 'linux/amd64', tag]);
     const output = await command('docker', ['run', '--rm', '--network', 'none', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--entrypoint', '/bin/sh', tag, '-c', 'test "$(id -u)" = 1001 && test "$(id -g)" = 1001 && test -L /proof-link && test "$(cat /proof-link)" = fixture && test "$(stat -c %a /proof.txt)" = 640 && test "$(stat -c %i /proof.txt)" = "$(stat -c %i /proof-hardlink)" && printf passed']);
     assert.equal(output, 'passed');
-  } finally { await command('docker', ['image', 'rm', tag]).catch(() => {}); await rm(work, { recursive: true, force: true }); }
+  } finally { if (server) await new Promise(resolve => server.close(resolve)); if (tag) await command('docker', ['image', 'rm', tag]).catch(() => {}); await rm(work, { recursive: true, force: true }); }
 });
