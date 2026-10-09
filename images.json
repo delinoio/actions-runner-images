@@ -499,7 +499,7 @@
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-10-08T02:47:57.437Z",
+        "checkedAt": "2026-10-09T02:50:33.710Z",
         "status": "waiting-for-release",
         "imageVersion": "20261004.327.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
@@ -961,7 +961,7 @@
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-10-08T02:47:58.462Z",
+        "checkedAt": "2026-10-09T02:50:24.168Z",
         "status": "unchanged",
         "imageVersion": "20260927.149.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
