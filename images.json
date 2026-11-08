@@ -832,8 +832,8 @@
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-11-07T02:27:15.699Z",
-        "status": "published",
+        "checkedAt": "2026-11-08T02:28:00.334Z",
+        "status": "unchanged",
         "imageVersion": "20261101.360.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
         "sourceRevision": "add4380b0d6685806e9192c33c37359ee0aa4023",
@@ -1632,8 +1632,8 @@
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-11-07T02:27:12.982Z",
-        "status": "published",
+        "checkedAt": "2026-11-08T02:27:58.596Z",
+        "status": "unchanged",
         "imageVersion": "20261101.186.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
         "sourceRevision": "0d1e1dce6485ada1862f1586b56fe15521c7710f",
