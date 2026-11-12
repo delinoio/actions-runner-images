@@ -832,12 +832,12 @@
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-11-11T02:26:29.203Z",
+        "checkedAt": "2026-11-12T02:28:00.904Z",
         "status": "unchanged",
         "imageVersion": "20261101.360.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
         "sourceRevision": "add4380b0d6685806e9192c33c37359ee0aa4023",
-        "docsRevision": "f29ba3467ba9178a9056047adcf7211c03321b28",
+        "docsRevision": "8ec03657a18e1821924600eb437f16c87d40c8b4",
         "code": null,
         "latestError": null,
         "maintenanceError": null
@@ -1632,12 +1632,12 @@
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-11-11T02:26:27.935Z",
+        "checkedAt": "2026-11-12T02:27:58.450Z",
         "status": "unchanged",
         "imageVersion": "20261101.186.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
         "sourceRevision": "0d1e1dce6485ada1862f1586b56fe15521c7710f",
-        "docsRevision": "f29ba3467ba9178a9056047adcf7211c03321b28",
+        "docsRevision": "8ec03657a18e1821924600eb437f16c87d40c8b4",
         "code": null,
         "latestError": null,
         "maintenanceError": null
