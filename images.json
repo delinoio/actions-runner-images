@@ -837,7 +837,7 @@
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-11-19T02:28:28.912Z",
+        "checkedAt": "2026-11-20T02:27:55.072Z",
         "status": "unchanged",
         "imageVersion": "20261111.370.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
@@ -1647,11 +1647,11 @@
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-11-19T02:28:29.005Z",
-        "status": "unchanged",
-        "imageVersion": "20261111.196.1",
+        "checkedAt": "2026-11-20T02:27:57.326Z",
+        "status": "waiting-for-release",
+        "imageVersion": "20261116.202.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
-        "sourceRevision": "93a4e4e98715026b60fdf86893cf193b4be3bd47",
+        "sourceRevision": null,
         "docsRevision": "fbb26cb01c3651ea3a0347e54bfa2ef83d740d49",
         "code": null,
         "latestError": null,
