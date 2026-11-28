@@ -5,173 +5,340 @@
   "images": {
     "24.04": {
       "published": {
-        "imageVersion": "20261116.376.1",
+        "imageVersion": "20261122.23.1",
         "recipeHash": "9024c08210d7a6d9f842758f398c1a41e3a36d210ca1d571d22f823e025d4f4b",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
-        "sourceRevision": "27322eb5268668e27e64007fdd1353ec7387dc0b",
-        "releaseTag": "ubuntu24/20261116.376",
-        "inventoryHash": "sha256:55d983072d87895ded77383ef4f85e6f4ed8290a1bd74d4d6836c4388971336e",
+        "sourceRevision": "710e8ff2142ab0ff47974681dba1ae59b2ac4982",
+        "releaseTag": "ubuntu24/20261122.23",
+        "inventoryHash": "sha256:8a26a4402499ea7e5c339a418f04b2905bd2ac0816c16e7c6a0b62108b00f4db",
         "configurationRepair": null,
-        "digest": "sha256:f3ebd1007e95ff2d2c74e9beb10ed606e1f55a456ab0b4b33cb9e8438956c593",
-        "ref": "ghcr.io/delinoio/actions-runner-images@sha256:f3ebd1007e95ff2d2c74e9beb10ed606e1f55a456ab0b4b33cb9e8438956c593",
-        "tag": "ubuntu24-20261116.376.1-9024c08210d7-44856015975-1",
-        "publishedAt": "2026-11-21T04:46:25.865Z",
+        "digest": "sha256:4357d11ff04350588e0e7943c5ff45878c25869117484e5a1deda52ce49d09a0",
+        "ref": "ghcr.io/delinoio/actions-runner-images@sha256:4357d11ff04350588e0e7943c5ff45878c25869117484e5a1deda52ce49d09a0",
+        "tag": "ubuntu24-20261122.23.1-9024c08210d7-46098242848-1",
+        "publishedAt": "2026-11-28T04:03:10.900Z",
         "validation": {
-          "digest": "sha256:f3ebd1007e95ff2d2c74e9beb10ed606e1f55a456ab0b4b33cb9e8438956c593",
-          "verifiedAt": "2026-11-21T04:46:10.377Z",
+          "digest": "sha256:4357d11ff04350588e0e7943c5ff45878c25869117484e5a1deda52ce49d09a0",
+          "verifiedAt": "2026-11-28T04:02:57.589Z",
           "softwareInventory": "passed",
           "aptInventory": "passed",
           "sandboxCompilation": "passed"
         },
         "layers": [
           {
-            "digest": "sha256:ec57d273bdb3645506d3d3e571fd2a5b745e49911f08808ce9248dc44db2938b",
-            "size": 792985441,
-            "uncompressed": 1660395520
+            "digest": "sha256:65cec27a15835d3ee611047e12caecac3991289542893628801d9cdd6b79d8e4",
+            "size": 794724442,
+            "uncompressed": 1663518720
           },
           {
-            "digest": "sha256:818a7a84bba2e3b235c537518adbd1156de31f901b37bb9c3387eed3570065ef",
-            "size": 906052284,
-            "uncompressed": 2074408960
+            "digest": "sha256:6e5f6fe4424128edb9397471cae2eb46bc7ad669f082a26c2152577ad2ea1de0",
+            "size": 905932901,
+            "uncompressed": 2067496960
           },
           {
-            "digest": "sha256:ba5d62423d433116af55f8dd1d0923cfce300175429862ecb8bb19aa341dcdca",
-            "size": 920767155,
-            "uncompressed": 2015406080
+            "digest": "sha256:757caae62cf84814e2012816fe294840ed8cd1554f611cd7f3f2061a104a809f",
+            "size": 911627023,
+            "uncompressed": 1977763840
           },
           {
-            "digest": "sha256:5665175dc05752c517504d4652dae431010cad2b75898a36b296f0f267410a15",
-            "size": 695398472,
-            "uncompressed": 1995663360
+            "digest": "sha256:984105fea9a6110617254991a5f4221668142eed92d9e4209e30556104765583",
+            "size": 696802686,
+            "uncompressed": 2005708800
           },
           {
-            "digest": "sha256:d7b1883632770908d400f839581d283dc85b8ccbbaf04d2891520318e131e2ef",
-            "size": 588912654,
-            "uncompressed": 1621196800
+            "digest": "sha256:720f389236643d805a6fc84b4e9ca6a3d5459a0ee85696f2c6fe513bcfb7adfd",
+            "size": 676581715,
+            "uncompressed": 1900738560
           },
           {
-            "digest": "sha256:535804938f27697dfdc7c474e2df6c21aa054a3d967286e9549355dd25142441",
-            "size": 1027024390,
-            "uncompressed": 1951262720
+            "digest": "sha256:c4580406df69131512c695f5f89e3697e5a2885fd1ce9f4af1202b59f70e5aea",
+            "size": 1035391531,
+            "uncompressed": 1964830720
           },
           {
-            "digest": "sha256:434b8268eafebe440d07deaaf86db88315eb2a638eaa1bb3df36b0ee7847a1d1",
-            "size": 761563773,
-            "uncompressed": 2095708160
+            "digest": "sha256:f7df41d127cf67b0745583a1d8ecb4d894e839bf0758900a245baf8ab8409d98",
+            "size": 761484557,
+            "uncompressed": 2095226880
           },
           {
-            "digest": "sha256:4f932685aef6516c3d418ac70af6735a4f4f6f9c6c2f0c826fac55fd92e4ca82",
-            "size": 847923985,
-            "uncompressed": 1862932480
+            "digest": "sha256:043b6250ccb9c4b4a99008ceae4e1db3478e0730fa57e6979790916b70bd3bca",
+            "size": 848387433,
+            "uncompressed": 1864857600
           },
           {
-            "digest": "sha256:25843c95cb789b4da4fd3b4e579b45a224b3169f41e949772d2ef8f86cb8bbef",
-            "size": 689190979,
-            "uncompressed": 2036234240
+            "digest": "sha256:941a3e64999ba234039534a0b8e00ab3c664c1358cb4a50a2a069ec2715253ff",
+            "size": 689258055,
+            "uncompressed": 2036357120
           },
           {
-            "digest": "sha256:b33e44b2d46764076c507ec0ea412fcf883f7a66b275575276b63e9bc021fbe2",
-            "size": 756393207,
-            "uncompressed": 2071726080
+            "digest": "sha256:ed2c9679139c96e699b586a7a79b6ba1eb624a7b154ac0052387ce182d183479",
+            "size": 756672633,
+            "uncompressed": 2072053760
           },
           {
-            "digest": "sha256:225b960be438e684f1aa249d75c01ee2163d84958b137166563812b923b0af2b",
-            "size": 520770959,
-            "uncompressed": 1835745280
+            "digest": "sha256:3acbc98d80d8e76f75d5fbbd28009efeb3a20dd85bbde9aec65df5ebc2fcd87f",
+            "size": 520784758,
+            "uncompressed": 1835765760
           },
           {
-            "digest": "sha256:cf71fa40d409277e4acd4cf699506a19f5477e7356fd5b9d41d85af536acd72f",
-            "size": 453408022,
+            "digest": "sha256:8c3de8a48c6773d71cc59667acb093f553dbe81f6a8fd97b835787e50f0c6207",
+            "size": 453402658,
             "uncompressed": 2135664640
           },
           {
-            "digest": "sha256:911e7976ad7d4ea7131d1e4bf5a20cae5ee19494a5b0de906399ea4a13963d03",
-            "size": 668699187,
-            "uncompressed": 2077327360
+            "digest": "sha256:396dfd9b15047439bfc0995d434a55935f45374008af766620d0aa11442acbc3",
+            "size": 672136271,
+            "uncompressed": 2085836800
           },
           {
-            "digest": "sha256:fdfaec799a30712793df92cb3cc125a688e9babde8fcd2949100ddb32754f4c9",
-            "size": 736631464,
-            "uncompressed": 2109009920
+            "digest": "sha256:83fd038315d83bac10932024cfb2cd8e3c9aed40668ac250064b8be2b979bee0",
+            "size": 736653103,
+            "uncompressed": 2109112320
           },
           {
-            "digest": "sha256:70ed4145315190ffd03a963f11489d415f56bd5685673ef512bf34bf8fdde442",
-            "size": 1211525263,
+            "digest": "sha256:2bdf7f24d43718d43aa9336c16184805958793f567da6eaefa32034cba93b047",
+            "size": 1211506734,
             "uncompressed": 2071582720
           },
           {
-            "digest": "sha256:2e95239fa542da6e89081f5c54dc899e41227e9d392fa0ba93e0399d27b4377c",
-            "size": 740785725,
+            "digest": "sha256:0f83e713de8cc039bc8864ffb0cf7431d32645043674c063dcd4e8cb2c6e9361",
+            "size": 740779395,
             "uncompressed": 2118983680
           },
           {
-            "digest": "sha256:57a00f46231becbddb9637f3fd13790962242da87cc3fa8d83a48780d2fc678b",
-            "size": 720198549,
+            "digest": "sha256:355091c857d8e9c370e3ee90cfa022a2a799e6b42522c1492c835b77b3780470",
+            "size": 720190587,
             "uncompressed": 2122076160
           },
           {
-            "digest": "sha256:46a4ebc726e13a15491916a17e03f68761ec863a8cbd8f361365d4f654855107",
-            "size": 715512632,
-            "uncompressed": 2099875840
+            "digest": "sha256:bcf1bdf8ccd938dfe1d336d664afbfa92a273dda90497450a81ef39238890b17",
+            "size": 715620611,
+            "uncompressed": 2099906560
           },
           {
-            "digest": "sha256:b571006c431b66fd2b2e2caff4b5153986e4428b37072a94be99414f5eab9999",
-            "size": 870853277,
-            "uncompressed": 1752494080
+            "digest": "sha256:42ea327a61ba954fa37ed30cd82b1785e4a65e0480f973ffca6efbb79d700bbd",
+            "size": 870818582,
+            "uncompressed": 1752647680
           },
           {
-            "digest": "sha256:6e6fa4382a8875ff557266d507ddeb0be4294bacefe7cc4d3e8ba39eb71435d8",
-            "size": 709026496,
-            "uncompressed": 1957273600
+            "digest": "sha256:cd3bcee52393155d41e9805c712ac83c3ba9cd9748cd9a6ccf37d46f4912b0f3",
+            "size": 702026665,
+            "uncompressed": 1942589440
           },
           {
-            "digest": "sha256:7d42a423ac064a20a0453e66b6ca9939ec173c82f0c574ddcba9116c4c65e76e",
-            "size": 538646442,
-            "uncompressed": 2098380800
+            "digest": "sha256:64985a599711cc99a0afcb7ad49864ea71a8b581904d982de4e98a57a112e506",
+            "size": 546589515,
+            "uncompressed": 2098186240
           },
           {
-            "digest": "sha256:005cd101eeafe3902827c46c2affdd80f3a6dc6370197d5b8667d95d833e6c96",
-            "size": 655586660,
-            "uncompressed": 2064547840
+            "digest": "sha256:e7aabee9b12663e20b6676ca2fd2d74e59c32815ee4d1ca92d13412fbd96140b",
+            "size": 658938284,
+            "uncompressed": 2084198400
           },
           {
-            "digest": "sha256:efaea951b04d7428ff01816c6a6f3bf5f1370e16463476135775dd9b9174c3de",
-            "size": 859190156,
-            "uncompressed": 2065776640
+            "digest": "sha256:17d062aecd35abc5551ed3d3a0431bc94854ad314a6423e8ab438e42cfc9fd69",
+            "size": 866116925,
+            "uncompressed": 2084433920
           },
           {
-            "digest": "sha256:1dcb9ea66ced6e7821ba3e1911ec3061f56319c73270a1cbc461f35dc5531333",
-            "size": 874837827,
+            "digest": "sha256:c95720224d299ef8a626f2b72e8404a8810a7d8d01b0a9a8e6d68036bcfce590",
+            "size": 874833603,
             "uncompressed": 2098503680
           },
           {
-            "digest": "sha256:af53e7f61ea7ee6fdc96b7e4dddc58ec48cf0d63e52160d5e1dacbe3e5882b91",
-            "size": 1048667193,
-            "uncompressed": 2007664640
+            "digest": "sha256:da265fe855dd99fe545bbcbb7ad60e8c270534b33644492ae165ae85190e0836",
+            "size": 1049054999,
+            "uncompressed": 2008125440
           },
           {
-            "digest": "sha256:db3916d0f78fe435ef934e0ce717b7f88079b5a17095b6a9639a1cfaf589bccb",
-            "size": 738838234,
-            "uncompressed": 1926144000
+            "digest": "sha256:f4f37692e110506b7b10570c84ab8cd8fb62824c09a0e4ddd48594e645712f8f",
+            "size": 739465366,
+            "uncompressed": 1928570880
           },
           {
-            "digest": "sha256:c2a50bcdbf9850ab4b4d7f08de21630155ce60781551e14f76c8cc8dd318f6dc",
-            "size": 752031569,
-            "uncompressed": 2144215040
+            "digest": "sha256:45526af5a61554a5e920bfde1e4ab530f8c6e5809fd3164a890f3dea42fa4415",
+            "size": 752000380,
+            "uncompressed": 2144245760
           },
           {
-            "digest": "sha256:d203ef92b900babff73467fbab7fbd36bf5377d9e32f21499a131663f12da3f5",
-            "size": 229486141,
-            "uncompressed": 1020385280
+            "digest": "sha256:f6b037d68bdfa23c7e370543700c34b8ea643d07d0350ff7f47160129a3bac67",
+            "size": 230375405,
+            "uncompressed": 1023959040
           },
           {
-            "digest": "sha256:e33f911476c6bfde847774c5c66b3ba3dc854223ac6c570b61a4720b150155aa",
-            "size": 55378,
+            "digest": "sha256:28c8cacd3cdcc2a10e69644cef69381b4653f6d154d10185e3ea7c7784ffd080",
+            "size": 55246,
             "uncompressed": 286720
           }
         ]
       },
       "history": [
+        {
+          "imageVersion": "20261122.23.1",
+          "recipeHash": "9024c08210d7a6d9f842758f398c1a41e3a36d210ca1d571d22f823e025d4f4b",
+          "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
+          "sourceRevision": "710e8ff2142ab0ff47974681dba1ae59b2ac4982",
+          "releaseTag": "ubuntu24/20261122.23",
+          "inventoryHash": "sha256:8a26a4402499ea7e5c339a418f04b2905bd2ac0816c16e7c6a0b62108b00f4db",
+          "configurationRepair": null,
+          "digest": "sha256:4357d11ff04350588e0e7943c5ff45878c25869117484e5a1deda52ce49d09a0",
+          "ref": "ghcr.io/delinoio/actions-runner-images@sha256:4357d11ff04350588e0e7943c5ff45878c25869117484e5a1deda52ce49d09a0",
+          "tag": "ubuntu24-20261122.23.1-9024c08210d7-46098242848-1",
+          "publishedAt": "2026-11-28T04:03:10.900Z",
+          "validation": {
+            "digest": "sha256:4357d11ff04350588e0e7943c5ff45878c25869117484e5a1deda52ce49d09a0",
+            "verifiedAt": "2026-11-28T04:02:57.589Z",
+            "softwareInventory": "passed",
+            "aptInventory": "passed",
+            "sandboxCompilation": "passed"
+          },
+          "layers": [
+            {
+              "digest": "sha256:65cec27a15835d3ee611047e12caecac3991289542893628801d9cdd6b79d8e4",
+              "size": 794724442,
+              "uncompressed": 1663518720
+            },
+            {
+              "digest": "sha256:6e5f6fe4424128edb9397471cae2eb46bc7ad669f082a26c2152577ad2ea1de0",
+              "size": 905932901,
+              "uncompressed": 2067496960
+            },
+            {
+              "digest": "sha256:757caae62cf84814e2012816fe294840ed8cd1554f611cd7f3f2061a104a809f",
+              "size": 911627023,
+              "uncompressed": 1977763840
+            },
+            {
+              "digest": "sha256:984105fea9a6110617254991a5f4221668142eed92d9e4209e30556104765583",
+              "size": 696802686,
+              "uncompressed": 2005708800
+            },
+            {
+              "digest": "sha256:720f389236643d805a6fc84b4e9ca6a3d5459a0ee85696f2c6fe513bcfb7adfd",
+              "size": 676581715,
+              "uncompressed": 1900738560
+            },
+            {
+              "digest": "sha256:c4580406df69131512c695f5f89e3697e5a2885fd1ce9f4af1202b59f70e5aea",
+              "size": 1035391531,
+              "uncompressed": 1964830720
+            },
+            {
+              "digest": "sha256:f7df41d127cf67b0745583a1d8ecb4d894e839bf0758900a245baf8ab8409d98",
+              "size": 761484557,
+              "uncompressed": 2095226880
+            },
+            {
+              "digest": "sha256:043b6250ccb9c4b4a99008ceae4e1db3478e0730fa57e6979790916b70bd3bca",
+              "size": 848387433,
+              "uncompressed": 1864857600
+            },
+            {
+              "digest": "sha256:941a3e64999ba234039534a0b8e00ab3c664c1358cb4a50a2a069ec2715253ff",
+              "size": 689258055,
+              "uncompressed": 2036357120
+            },
+            {
+              "digest": "sha256:ed2c9679139c96e699b586a7a79b6ba1eb624a7b154ac0052387ce182d183479",
+              "size": 756672633,
+              "uncompressed": 2072053760
+            },
+            {
+              "digest": "sha256:3acbc98d80d8e76f75d5fbbd28009efeb3a20dd85bbde9aec65df5ebc2fcd87f",
+              "size": 520784758,
+              "uncompressed": 1835765760
+            },
+            {
+              "digest": "sha256:8c3de8a48c6773d71cc59667acb093f553dbe81f6a8fd97b835787e50f0c6207",
+              "size": 453402658,
+              "uncompressed": 2135664640
+            },
+            {
+              "digest": "sha256:396dfd9b15047439bfc0995d434a55935f45374008af766620d0aa11442acbc3",
+              "size": 672136271,
+              "uncompressed": 2085836800
+            },
+            {
+              "digest": "sha256:83fd038315d83bac10932024cfb2cd8e3c9aed40668ac250064b8be2b979bee0",
+              "size": 736653103,
+              "uncompressed": 2109112320
+            },
+            {
+              "digest": "sha256:2bdf7f24d43718d43aa9336c16184805958793f567da6eaefa32034cba93b047",
+              "size": 1211506734,
+              "uncompressed": 2071582720
+            },
+            {
+              "digest": "sha256:0f83e713de8cc039bc8864ffb0cf7431d32645043674c063dcd4e8cb2c6e9361",
+              "size": 740779395,
+              "uncompressed": 2118983680
+            },
+            {
+              "digest": "sha256:355091c857d8e9c370e3ee90cfa022a2a799e6b42522c1492c835b77b3780470",
+              "size": 720190587,
+              "uncompressed": 2122076160
+            },
+            {
+              "digest": "sha256:bcf1bdf8ccd938dfe1d336d664afbfa92a273dda90497450a81ef39238890b17",
+              "size": 715620611,
+              "uncompressed": 2099906560
+            },
+            {
+              "digest": "sha256:42ea327a61ba954fa37ed30cd82b1785e4a65e0480f973ffca6efbb79d700bbd",
+              "size": 870818582,
+              "uncompressed": 1752647680
+            },
+            {
+              "digest": "sha256:cd3bcee52393155d41e9805c712ac83c3ba9cd9748cd9a6ccf37d46f4912b0f3",
+              "size": 702026665,
+              "uncompressed": 1942589440
+            },
+            {
+              "digest": "sha256:64985a599711cc99a0afcb7ad49864ea71a8b581904d982de4e98a57a112e506",
+              "size": 546589515,
+              "uncompressed": 2098186240
+            },
+            {
+              "digest": "sha256:e7aabee9b12663e20b6676ca2fd2d74e59c32815ee4d1ca92d13412fbd96140b",
+              "size": 658938284,
+              "uncompressed": 2084198400
+            },
+            {
+              "digest": "sha256:17d062aecd35abc5551ed3d3a0431bc94854ad314a6423e8ab438e42cfc9fd69",
+              "size": 866116925,
+              "uncompressed": 2084433920
+            },
+            {
+              "digest": "sha256:c95720224d299ef8a626f2b72e8404a8810a7d8d01b0a9a8e6d68036bcfce590",
+              "size": 874833603,
+              "uncompressed": 2098503680
+            },
+            {
+              "digest": "sha256:da265fe855dd99fe545bbcbb7ad60e8c270534b33644492ae165ae85190e0836",
+              "size": 1049054999,
+              "uncompressed": 2008125440
+            },
+            {
+              "digest": "sha256:f4f37692e110506b7b10570c84ab8cd8fb62824c09a0e4ddd48594e645712f8f",
+              "size": 739465366,
+              "uncompressed": 1928570880
+            },
+            {
+              "digest": "sha256:45526af5a61554a5e920bfde1e4ab530f8c6e5809fd3164a890f3dea42fa4415",
+              "size": 752000380,
+              "uncompressed": 2144245760
+            },
+            {
+              "digest": "sha256:f6b037d68bdfa23c7e370543700c34b8ea643d07d0350ff7f47160129a3bac67",
+              "size": 230375405,
+              "uncompressed": 1023959040
+            },
+            {
+              "digest": "sha256:28c8cacd3cdcc2a10e69644cef69381b4653f6d154d10185e3ea7c7784ffd080",
+              "size": 55246,
+              "uncompressed": 286720
+            }
+          ]
+        },
         {
           "imageVersion": "20261116.376.1",
           "recipeHash": "9024c08210d7a6d9f842758f398c1a41e3a36d210ca1d571d22f823e025d4f4b",
@@ -672,182 +839,15 @@
               "uncompressed": 286720
             }
           ]
-        },
-        {
-          "imageVersion": "20261026.354.1",
-          "recipeHash": "9024c08210d7a6d9f842758f398c1a41e3a36d210ca1d571d22f823e025d4f4b",
-          "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
-          "sourceRevision": "ac85c71971895cd6234578d6b11f49f7c27ff0c4",
-          "releaseTag": "ubuntu24/20261026.354",
-          "inventoryHash": "sha256:978630ab6622f58d715b29c1fe0f773fc1c45f0094dc5bf8b16c08fa6aa5b034",
-          "configurationRepair": null,
-          "digest": "sha256:fb97dc8a2d57947959b8d30617978a6406ad5a85cdece9bfbad3e8be8a62fe3d",
-          "ref": "ghcr.io/delinoio/actions-runner-images@sha256:fb97dc8a2d57947959b8d30617978a6406ad5a85cdece9bfbad3e8be8a62fe3d",
-          "tag": "ubuntu24-20261026.354.1-9024c08210d7-40806758172-1",
-          "publishedAt": "2026-10-29T03:46:40.730Z",
-          "validation": {
-            "digest": "sha256:fb97dc8a2d57947959b8d30617978a6406ad5a85cdece9bfbad3e8be8a62fe3d",
-            "verifiedAt": "2026-10-29T03:46:26.817Z",
-            "softwareInventory": "passed",
-            "aptInventory": "passed",
-            "sandboxCompilation": "passed"
-          },
-          "layers": [
-            {
-              "digest": "sha256:272597390e87a43124045d9ef5d02da796f69b0601058e2f7d7e1a5880d31e27",
-              "size": 796221771,
-              "uncompressed": 1654968320
-            },
-            {
-              "digest": "sha256:77d68b5f31221da1515a1c44acc3a36b86054f41f7afa937997f9d21116a6f0d",
-              "size": 927518568,
-              "uncompressed": 2068910080
-            },
-            {
-              "digest": "sha256:15f756344fc31da3e09af39f4d285e4b38d7d65e0aef84fed121cf2d9891c8bb",
-              "size": 898642254,
-              "uncompressed": 2011934720
-            },
-            {
-              "digest": "sha256:4c805ed56a2755088b3c5bc7fff62b63e91161d36dde9a2b1b4120e4c3745c2e",
-              "size": 678339968,
-              "uncompressed": 1947545600
-            },
-            {
-              "digest": "sha256:506f5e337a174c2db665d5038e5f93c07f1e81d103e1ef8a2cc6e219f0373ea4",
-              "size": 594412249,
-              "uncompressed": 1622497280
-            },
-            {
-              "digest": "sha256:53c8fb053f2c3bd6419e7bb5a67aa0eb10b19054fded616be4ef02b1d63ade97",
-              "size": 1022670801,
-              "uncompressed": 1931755520
-            },
-            {
-              "digest": "sha256:055af2d40a8f4ac907565b34d21a7075bbada764d666fc3da9ede52b53ff666f",
-              "size": 760495210,
-              "uncompressed": 2096107520
-            },
-            {
-              "digest": "sha256:0f227eff3997a57ad4798530d49a9c84fb6965706cbae025bb6e96ac00b01539",
-              "size": 849337219,
-              "uncompressed": 1872281600
-            },
-            {
-              "digest": "sha256:cc99aad4c3dacd10dd154758b02fc0d6da0d0a5f6c2c2e6e03f008edad2a76f9",
-              "size": 689198206,
-              "uncompressed": 2036142080
-            },
-            {
-              "digest": "sha256:1c4eaa3cd257b8bc962df6183e799eb743f2d52a5c57416df818d930f7740f24",
-              "size": 759876700,
-              "uncompressed": 2079129600
-            },
-            {
-              "digest": "sha256:ed3fb722eb72f49047eb602dba438f160bd68446d7c08ac556d82fc1e3b7e0c6",
-              "size": 533124286,
-              "uncompressed": 1865287680
-            },
-            {
-              "digest": "sha256:be1aac2c894bbbc6f9b53e27592ed92695901aa42c7592f171aec36b61ab2c5f",
-              "size": 453409665,
-              "uncompressed": 2135664640
-            },
-            {
-              "digest": "sha256:5efc3ad99da5bfc662288f0c64483e4e48affc8ea8133e4bb2b06d69e37ed9d5",
-              "size": 666659983,
-              "uncompressed": 2074460160
-            },
-            {
-              "digest": "sha256:d370e0df08d815ff3ae03727b7db7253e4208c2e4ec59eb9b67dd33a9ad0dd25",
-              "size": 738177284,
-              "uncompressed": 2113034240
-            },
-            {
-              "digest": "sha256:34a207e7481a4dbcdf8575e823b17063b5094e7174be19921345ad57cda9a0e0",
-              "size": 1214904218,
-              "uncompressed": 2076231680
-            },
-            {
-              "digest": "sha256:c4e9dc15c0be36549544e9f071e96efa4fde760e0d4b4b7c38c9b602d9b1cdc1",
-              "size": 740776147,
-              "uncompressed": 2118983680
-            },
-            {
-              "digest": "sha256:2334b86e530a8175f184a375ec9646d8ab564436697683cf773a95911e5b586f",
-              "size": 720197989,
-              "uncompressed": 2122076160
-            },
-            {
-              "digest": "sha256:0560e4bc228949f8b1b18b12310260b31240f1a0891bab0b9e9b46c04ff03c81",
-              "size": 715511372,
-              "uncompressed": 2099875840
-            },
-            {
-              "digest": "sha256:89f5f8f0db21a942c472f5ed0869e2a276ed9b32baa8aed7e880c2d6664042c2",
-              "size": 870858628,
-              "uncompressed": 1752309760
-            },
-            {
-              "digest": "sha256:1605e80b9de37d1173494e0d002daec6564fb80329f1ee708486de44e4d70f1f",
-              "size": 704625408,
-              "uncompressed": 1944627200
-            },
-            {
-              "digest": "sha256:d77339dd5357406c8342cce3800110914b8f7b5058c6f7274f8a8c51dc122f4d",
-              "size": 537554702,
-              "uncompressed": 2097131520
-            },
-            {
-              "digest": "sha256:3290d060ce34f41da530ff6d11856cb7e354719601b7aae57c67d3f458cc082b",
-              "size": 693544511,
-              "uncompressed": 2087362560
-            },
-            {
-              "digest": "sha256:5de8472fa885b986855cb60db4f42fd4dec415274df794c493e7094093d3cf13",
-              "size": 864024313,
-              "uncompressed": 2100152320
-            },
-            {
-              "digest": "sha256:d61fa21798b2caf15bbc875aec0a2bde78cb68ac9916fbfa7cd1409684b9b621",
-              "size": 899646403,
-              "uncompressed": 2106030080
-            },
-            {
-              "digest": "sha256:9a9145c2fc50d684339a0bd4e01e0a6033250c380ccc2478e57555c6a123b681",
-              "size": 1044615870,
-              "uncompressed": 1947320320
-            },
-            {
-              "digest": "sha256:1447ca5f9adb62fea7c8875ff6ace0b57f065c80d28b5cba48ded1be00ef844a",
-              "size": 645224608,
-              "uncompressed": 1965680640
-            },
-            {
-              "digest": "sha256:e137c536806e2c8c3233b3e993297d682663ca8c67e18801062325ac201a5da6",
-              "size": 709007919,
-              "uncompressed": 2057625600
-            },
-            {
-              "digest": "sha256:e22e1d361ef8e63c6d87fd711b89cfd65e18b7c65c1398b8f130be5d7958631e",
-              "size": 83313741,
-              "uncompressed": 502589440
-            },
-            {
-              "digest": "sha256:d35e4b243cf626f584e58897a9d50b314a611eb212a60c6f3d8d7a6cafeab6fd",
-              "size": 55331,
-              "uncompressed": 286720
-            }
-          ]
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-11-27T02:29:53.106Z",
-        "status": "waiting-for-release",
+        "checkedAt": "2026-11-28T02:28:56.823Z",
+        "status": "published",
         "imageVersion": "20261122.23.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
-        "sourceRevision": null,
-        "docsRevision": "defaed523ed759d372cf758620ba2908d434c3be",
+        "sourceRevision": "710e8ff2142ab0ff47974681dba1ae59b2ac4982",
+        "docsRevision": "1ede08b87c78b9a8871f4761a20f9b5fd94796c4",
         "code": null,
         "latestError": null,
         "maintenanceError": null
@@ -855,168 +855,330 @@
     },
     "26.04": {
       "published": {
-        "imageVersion": "20261116.202.1",
+        "imageVersion": "20261122.9.1",
         "recipeHash": "9024c08210d7a6d9f842758f398c1a41e3a36d210ca1d571d22f823e025d4f4b",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
-        "sourceRevision": "3556d77480d4ddcea99344ba63343bc623f81e59",
-        "releaseTag": "ubuntu26/20261116.202",
-        "inventoryHash": "sha256:82b5142d53443a9ce1e16351a7e314ee37ca3925063a306632d1ea71792367cb",
+        "sourceRevision": "5a6c8c9684029934a7260368a01f4787a4289bc3",
+        "releaseTag": "ubuntu26/20261122.9",
+        "inventoryHash": "sha256:56f804e8d2bba4ea1666cdd29082f39c66f9426740f889a9cd1e7c6a3b47ff79",
         "configurationRepair": null,
-        "digest": "sha256:d420ff37b9026bde58ddc4e3aba71271759b4cec8ba7e4660f8eeb161d13c430",
-        "ref": "ghcr.io/delinoio/actions-runner-images@sha256:d420ff37b9026bde58ddc4e3aba71271759b4cec8ba7e4660f8eeb161d13c430",
-        "tag": "ubuntu26-20261116.202.1-9024c08210d7-44856015975-1",
-        "publishedAt": "2026-11-21T03:35:09.000Z",
+        "digest": "sha256:25b7881a1aef3f95b84f45c466c3a80333f0d189de60c669a22aad55010e363f",
+        "ref": "ghcr.io/delinoio/actions-runner-images@sha256:25b7881a1aef3f95b84f45c466c3a80333f0d189de60c669a22aad55010e363f",
+        "tag": "ubuntu26-20261122.9.1-9024c08210d7-46098242848-1",
+        "publishedAt": "2026-11-28T03:44:01.692Z",
         "validation": {
-          "digest": "sha256:d420ff37b9026bde58ddc4e3aba71271759b4cec8ba7e4660f8eeb161d13c430",
-          "verifiedAt": "2026-11-21T03:34:55.114Z",
+          "digest": "sha256:25b7881a1aef3f95b84f45c466c3a80333f0d189de60c669a22aad55010e363f",
+          "verifiedAt": "2026-11-28T03:43:46.341Z",
           "softwareInventory": "passed",
           "aptInventory": "passed",
           "sandboxCompilation": "passed"
         },
         "layers": [
           {
-            "digest": "sha256:5679d9d08405ccc6f4fd565e3b506f38d4a3a2ba66101fd0627bdc423aa478f3",
-            "size": 792232945,
-            "uncompressed": 1642475520
+            "digest": "sha256:3671684c781f6d83e0eb41e2474b6aa2120fc22b71ba6c3dad408538821d1de7",
+            "size": 794442793,
+            "uncompressed": 1645731840
           },
           {
-            "digest": "sha256:408462831358480e98f858152815cc0fdecc43c0bd747d639200d8ee26a4541c",
-            "size": 903667865,
-            "uncompressed": 2068930560
+            "digest": "sha256:be917cac8877f616ff3b6416057d9752897106c09442c29f63b693c69572369e",
+            "size": 903633901,
+            "uncompressed": 2070251520
           },
           {
-            "digest": "sha256:fb3d64c6e1e146c0fae257791fae52ac0f0750b325c3c94331e0bed27176f1b0",
-            "size": 915067624,
-            "uncompressed": 2013941760
+            "digest": "sha256:ef41404827e0b5cfad2a4996f4e3e717f76bdab6025ca96845640889c822217d",
+            "size": 920154435,
+            "uncompressed": 2015539200
           },
           {
-            "digest": "sha256:78415fa0ae6022cd369c4698c2717b58785dd57e0c0a4986a7a32f49f122108f",
-            "size": 700324859,
-            "uncompressed": 1997977600
+            "digest": "sha256:1e8ebbeff0b00ceb54a4d023f3b953511cf7eefa95b9f50b5e7cdf74b169210a",
+            "size": 700994007,
+            "uncompressed": 2002667520
           },
           {
-            "digest": "sha256:3802f61c4ca4a89b3ae685d0dc4cae8f8611aaeb205a75811023fc06682aee52",
-            "size": 588932748,
-            "uncompressed": 1621196800
+            "digest": "sha256:66edce2f99f6a258eb4a022f1deabb5c927d7bed8763aa98154698441ac11145",
+            "size": 663091171,
+            "uncompressed": 1858621440
           },
           {
-            "digest": "sha256:e8e18e38417d96cebee23347a9df648018f319fdbab5204af78125f191ea9eb8",
-            "size": 1198056506,
-            "uncompressed": 2042972160
+            "digest": "sha256:31201a282322d6dfbb27a37dc2ea9d6d6fede2781a9f9e9f6b831b5be1d29786",
+            "size": 1203628410,
+            "uncompressed": 2045798400
           },
           {
-            "digest": "sha256:e8d4fe06fbb8b7abd1337958f6459f30cc535ef796511d488aec7675689671da",
-            "size": 738158280,
-            "uncompressed": 2053007360
+            "digest": "sha256:77a6439bac0d462b35a5ce0e59609ca8ec9cb6a1bd1f9ec94bae7bb0ed1febb6",
+            "size": 737900880,
+            "uncompressed": 2051717120
           },
           {
-            "digest": "sha256:8376dddce7bc75d409624ff94a45ff883a8055802c71e5d86075e3b3f6eb6e26",
-            "size": 850320230,
-            "uncompressed": 1987082240
+            "digest": "sha256:19a5a6de0527562628981b766324d9d15f065306700eb12632eebcedccb47bcc",
+            "size": 850678598,
+            "uncompressed": 1988433920
           },
           {
-            "digest": "sha256:a8497478aeaa9d7f64b74081b22a33b6b79e5b1159ec678650e9b6a60b8f3ad0",
-            "size": 704892353,
-            "uncompressed": 2132039680
+            "digest": "sha256:c7978d5d9692d30faa089423c28a03dd8529b7e9c61df7979fd29e61682e8957",
+            "size": 704932782,
+            "uncompressed": 2132090880
           },
           {
-            "digest": "sha256:d6f7b8dfadac3e799654f263d228be6fc3e35f9cb77c8d1c4f51375d4424c5f2",
-            "size": 806197483,
-            "uncompressed": 2076446720
+            "digest": "sha256:f7b2cc3c075b928bbaaf8abb63be928a129029deee5a9f142e6645d3b5e57be5",
+            "size": 806362138,
+            "uncompressed": 2076897280
           },
           {
-            "digest": "sha256:e4b9c06d5c7c14cc8d62c91e37aa3156c3354cb55ba22b4eb310517213ed9202",
-            "size": 525590552,
-            "uncompressed": 1789470720
+            "digest": "sha256:4e51e90f9e89b9ecdbe52805158e90e7a037f9b9ddc985c4a4c797bea5bc4b17",
+            "size": 525579412,
+            "uncompressed": 1789480960
           },
           {
-            "digest": "sha256:b292928062fb4d8ae93e2776b1791ec9b37e0223dda77bd316f3a7124bc7a99c",
-            "size": 453414342,
+            "digest": "sha256:18a3ca8c0a2ca6af9d39841ff821463baa61bae30c0a4ac66fb1a5b8e359fda3",
+            "size": 453410297,
             "uncompressed": 2135664640
           },
           {
-            "digest": "sha256:c2869b702c2bd7a5af1978c7b283d9d763928bec2c3300a25ffb895656e7a0c1",
-            "size": 675749078,
-            "uncompressed": 2099927040
+            "digest": "sha256:8c057689481889cc01385620aee11324318806d764cbe216fb082ea85f98d534",
+            "size": 672573279,
+            "uncompressed": 2095165440
           },
           {
-            "digest": "sha256:558268b0b0e6ab55dc7d9e6c9db3a9f68acb4300abcdcb3814dd9452a2c1037d",
-            "size": 1187380080,
-            "uncompressed": 2067251200
+            "digest": "sha256:83e8fd57fb623358b356564ab81fb5125b068b47d9221f8c99481af58b865434",
+            "size": 1183133530,
+            "uncompressed": 2067978240
           },
           {
-            "digest": "sha256:2a0a314bd0aa268e476539ee73b801649d395ec3709c9bea6a0b6bb2b0b3737e",
-            "size": 769552770,
-            "uncompressed": 2115901440
+            "digest": "sha256:ef42251d2d82d613541e244d4d51237a4aa6d00844d0af656fdc213eeb25137e",
+            "size": 774166741,
+            "uncompressed": 2113198080
           },
           {
-            "digest": "sha256:17f1cb3096c508139e60c244e77aec0e10c13002b6b7f8d325fcfb6ebfd18a73",
-            "size": 743476346,
-            "uncompressed": 2139822080
+            "digest": "sha256:f337f80e6545ab7ddce5c30397be3c65ace7d7f3044b2f367783eda939ea5b0c",
+            "size": 714780119,
+            "uncompressed": 2052003840
           },
           {
-            "digest": "sha256:137793b28e3b9c6c1232797daba492dedc4090abb813ce9562f1efde7a9811e4",
-            "size": 737765945,
-            "uncompressed": 2121031680
+            "digest": "sha256:2342e7fd1743fc7993c6cf1bdd14f4af0a14643b7346e97a871a9c741a5916c4",
+            "size": 692421749,
+            "uncompressed": 1991587840
           },
           {
-            "digest": "sha256:c505fe0a7444a2368bb9a5e20a399dc8eb3b9c607529a48d36339dea7ab4b1ff",
-            "size": 815786408,
-            "uncompressed": 1845114880
+            "digest": "sha256:2a5cee16ee51747067f7fc4e76ce2a9f572158d68cc9b07107982fae95099222",
+            "size": 813587815,
+            "uncompressed": 1889126400
           },
           {
-            "digest": "sha256:06ae9842227b84ad3b19f7d835ebce6682c7c2e7409fe15cf80cb3b8376197d8",
-            "size": 637970151,
-            "uncompressed": 1451847680
+            "digest": "sha256:3f61bde51fc0ab900e2158455bda53185df481f11b6b9bdb302a1c9706449553",
+            "size": 723616204,
+            "uncompressed": 1647554560
           },
           {
-            "digest": "sha256:a5464e64fc7f3194b17fbc672f5a6cf1d30fd8028a259d99de31d883516833ec",
-            "size": 526258897,
-            "uncompressed": 2128056320
+            "digest": "sha256:95ec6119b5dc82db2b31f66027bfa4aa3c795193e679a4bc029f69b959397ff7",
+            "size": 530324762,
+            "uncompressed": 2121256960
           },
           {
-            "digest": "sha256:aa36ef8d3fb3fdd720252d654940a20229e45e09353a3ba77a6abb174e4c164d",
-            "size": 619567685,
-            "uncompressed": 2029516800
+            "digest": "sha256:88be9d0b853b6cb370c1bf1a97add7a4420f0e8fa64da200bb8fabefcc597b71",
+            "size": 621284330,
+            "uncompressed": 2047344640
           },
           {
-            "digest": "sha256:a6f708c66550c5534a116c95581b1aff5102d68274dfb9b612b67be53fabfe93",
-            "size": 876042265,
+            "digest": "sha256:813cc9fb7f79fade23b45a6d7304eda7d1803a8badf9a1a91af7e013a6b2dc35",
+            "size": 876038164,
             "uncompressed": 2096332800
           },
           {
-            "digest": "sha256:13e6d15644263021d172c09828346d24b7f61a1aedf8ae02e93731cff56d76f8",
-            "size": 862424757,
+            "digest": "sha256:6e13698c460f28b9a16fa8b3e9c73424316df75301bb47dfc526acec5405fde7",
+            "size": 862425116,
             "uncompressed": 2101442560
           },
           {
-            "digest": "sha256:c0a9c9c411e27ba4cad9b31afc9ff1233d5b9a60e5395dcdc6cf6fd9dccc2f1e",
-            "size": 1113042774,
-            "uncompressed": 2089441280
+            "digest": "sha256:2715af56e2ce667fcc4b8969bb533f73221807de7e5183339ca63d15d4478b45",
+            "size": 1113487294,
+            "uncompressed": 2089758720
           },
           {
-            "digest": "sha256:06304f23b4e7d391e6b72afff85f82a3129c4897e042189ebc2c25c5cff190aa",
-            "size": 644828503,
-            "uncompressed": 2018385920
+            "digest": "sha256:8d0861d4bc1fc8571fa88e45f1804cfef561eba9bc666d34a393ade8a3b25bb7",
+            "size": 646355888,
+            "uncompressed": 2023157760
           },
           {
-            "digest": "sha256:b8afa6f2cafbe90a1f45377d70f6c556e90e2ae40b166ce1ba359bcbabf8efc7",
-            "size": 707945399,
-            "uncompressed": 2071756800
+            "digest": "sha256:eadb69d87474348da75e61f438e3126a783d035589588f90b4381495fa303333",
+            "size": 708186618,
+            "uncompressed": 2072494080
           },
           {
-            "digest": "sha256:497b3d853781f09c44207b6f5cd73b7b5eea7596a459f6a4cd0d99cdfaf35e80",
-            "size": 32485940,
-            "uncompressed": 348037120
+            "digest": "sha256:d39bcfa4b7e407dfca58b8cc620f15c8fdc51073a7b09510960ba71f4d84c912",
+            "size": 32450173,
+            "uncompressed": 348303360
           },
           {
-            "digest": "sha256:a5135e75ecca453f8ff91c8d208e8d1ab8874db6bd0b37d67b7a1ba9853bc28b",
-            "size": 54651,
+            "digest": "sha256:140204d08937a2b8759859e226e2d94f5c8211c48e383daedb20344e3a8f901e",
+            "size": 54588,
             "uncompressed": 286720
           }
         ]
       },
       "history": [
+        {
+          "imageVersion": "20261122.9.1",
+          "recipeHash": "9024c08210d7a6d9f842758f398c1a41e3a36d210ca1d571d22f823e025d4f4b",
+          "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
+          "sourceRevision": "5a6c8c9684029934a7260368a01f4787a4289bc3",
+          "releaseTag": "ubuntu26/20261122.9",
+          "inventoryHash": "sha256:56f804e8d2bba4ea1666cdd29082f39c66f9426740f889a9cd1e7c6a3b47ff79",
+          "configurationRepair": null,
+          "digest": "sha256:25b7881a1aef3f95b84f45c466c3a80333f0d189de60c669a22aad55010e363f",
+          "ref": "ghcr.io/delinoio/actions-runner-images@sha256:25b7881a1aef3f95b84f45c466c3a80333f0d189de60c669a22aad55010e363f",
+          "tag": "ubuntu26-20261122.9.1-9024c08210d7-46098242848-1",
+          "publishedAt": "2026-11-28T03:44:01.692Z",
+          "validation": {
+            "digest": "sha256:25b7881a1aef3f95b84f45c466c3a80333f0d189de60c669a22aad55010e363f",
+            "verifiedAt": "2026-11-28T03:43:46.341Z",
+            "softwareInventory": "passed",
+            "aptInventory": "passed",
+            "sandboxCompilation": "passed"
+          },
+          "layers": [
+            {
+              "digest": "sha256:3671684c781f6d83e0eb41e2474b6aa2120fc22b71ba6c3dad408538821d1de7",
+              "size": 794442793,
+              "uncompressed": 1645731840
+            },
+            {
+              "digest": "sha256:be917cac8877f616ff3b6416057d9752897106c09442c29f63b693c69572369e",
+              "size": 903633901,
+              "uncompressed": 2070251520
+            },
+            {
+              "digest": "sha256:ef41404827e0b5cfad2a4996f4e3e717f76bdab6025ca96845640889c822217d",
+              "size": 920154435,
+              "uncompressed": 2015539200
+            },
+            {
+              "digest": "sha256:1e8ebbeff0b00ceb54a4d023f3b953511cf7eefa95b9f50b5e7cdf74b169210a",
+              "size": 700994007,
+              "uncompressed": 2002667520
+            },
+            {
+              "digest": "sha256:66edce2f99f6a258eb4a022f1deabb5c927d7bed8763aa98154698441ac11145",
+              "size": 663091171,
+              "uncompressed": 1858621440
+            },
+            {
+              "digest": "sha256:31201a282322d6dfbb27a37dc2ea9d6d6fede2781a9f9e9f6b831b5be1d29786",
+              "size": 1203628410,
+              "uncompressed": 2045798400
+            },
+            {
+              "digest": "sha256:77a6439bac0d462b35a5ce0e59609ca8ec9cb6a1bd1f9ec94bae7bb0ed1febb6",
+              "size": 737900880,
+              "uncompressed": 2051717120
+            },
+            {
+              "digest": "sha256:19a5a6de0527562628981b766324d9d15f065306700eb12632eebcedccb47bcc",
+              "size": 850678598,
+              "uncompressed": 1988433920
+            },
+            {
+              "digest": "sha256:c7978d5d9692d30faa089423c28a03dd8529b7e9c61df7979fd29e61682e8957",
+              "size": 704932782,
+              "uncompressed": 2132090880
+            },
+            {
+              "digest": "sha256:f7b2cc3c075b928bbaaf8abb63be928a129029deee5a9f142e6645d3b5e57be5",
+              "size": 806362138,
+              "uncompressed": 2076897280
+            },
+            {
+              "digest": "sha256:4e51e90f9e89b9ecdbe52805158e90e7a037f9b9ddc985c4a4c797bea5bc4b17",
+              "size": 525579412,
+              "uncompressed": 1789480960
+            },
+            {
+              "digest": "sha256:18a3ca8c0a2ca6af9d39841ff821463baa61bae30c0a4ac66fb1a5b8e359fda3",
+              "size": 453410297,
+              "uncompressed": 2135664640
+            },
+            {
+              "digest": "sha256:8c057689481889cc01385620aee11324318806d764cbe216fb082ea85f98d534",
+              "size": 672573279,
+              "uncompressed": 2095165440
+            },
+            {
+              "digest": "sha256:83e8fd57fb623358b356564ab81fb5125b068b47d9221f8c99481af58b865434",
+              "size": 1183133530,
+              "uncompressed": 2067978240
+            },
+            {
+              "digest": "sha256:ef42251d2d82d613541e244d4d51237a4aa6d00844d0af656fdc213eeb25137e",
+              "size": 774166741,
+              "uncompressed": 2113198080
+            },
+            {
+              "digest": "sha256:f337f80e6545ab7ddce5c30397be3c65ace7d7f3044b2f367783eda939ea5b0c",
+              "size": 714780119,
+              "uncompressed": 2052003840
+            },
+            {
+              "digest": "sha256:2342e7fd1743fc7993c6cf1bdd14f4af0a14643b7346e97a871a9c741a5916c4",
+              "size": 692421749,
+              "uncompressed": 1991587840
+            },
+            {
+              "digest": "sha256:2a5cee16ee51747067f7fc4e76ce2a9f572158d68cc9b07107982fae95099222",
+              "size": 813587815,
+              "uncompressed": 1889126400
+            },
+            {
+              "digest": "sha256:3f61bde51fc0ab900e2158455bda53185df481f11b6b9bdb302a1c9706449553",
+              "size": 723616204,
+              "uncompressed": 1647554560
+            },
+            {
+              "digest": "sha256:95ec6119b5dc82db2b31f66027bfa4aa3c795193e679a4bc029f69b959397ff7",
+              "size": 530324762,
+              "uncompressed": 2121256960
+            },
+            {
+              "digest": "sha256:88be9d0b853b6cb370c1bf1a97add7a4420f0e8fa64da200bb8fabefcc597b71",
+              "size": 621284330,
+              "uncompressed": 2047344640
+            },
+            {
+              "digest": "sha256:813cc9fb7f79fade23b45a6d7304eda7d1803a8badf9a1a91af7e013a6b2dc35",
+              "size": 876038164,
+              "uncompressed": 2096332800
+            },
+            {
+              "digest": "sha256:6e13698c460f28b9a16fa8b3e9c73424316df75301bb47dfc526acec5405fde7",
+              "size": 862425116,
+              "uncompressed": 2101442560
+            },
+            {
+              "digest": "sha256:2715af56e2ce667fcc4b8969bb533f73221807de7e5183339ca63d15d4478b45",
+              "size": 1113487294,
+              "uncompressed": 2089758720
+            },
+            {
+              "digest": "sha256:8d0861d4bc1fc8571fa88e45f1804cfef561eba9bc666d34a393ade8a3b25bb7",
+              "size": 646355888,
+              "uncompressed": 2023157760
+            },
+            {
+              "digest": "sha256:eadb69d87474348da75e61f438e3126a783d035589588f90b4381495fa303333",
+              "size": 708186618,
+              "uncompressed": 2072494080
+            },
+            {
+              "digest": "sha256:d39bcfa4b7e407dfca58b8cc620f15c8fdc51073a7b09510960ba71f4d84c912",
+              "size": 32450173,
+              "uncompressed": 348303360
+            },
+            {
+              "digest": "sha256:140204d08937a2b8759859e226e2d94f5c8211c48e383daedb20344e3a8f901e",
+              "size": 54588,
+              "uncompressed": 286720
+            }
+          ]
+        },
         {
           "imageVersion": "20261116.202.1",
           "recipeHash": "9024c08210d7a6d9f842758f398c1a41e3a36d210ca1d571d22f823e025d4f4b",
@@ -1497,172 +1659,15 @@
               "uncompressed": 286720
             }
           ]
-        },
-        {
-          "imageVersion": "20261026.180.1",
-          "recipeHash": "9024c08210d7a6d9f842758f398c1a41e3a36d210ca1d571d22f823e025d4f4b",
-          "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
-          "sourceRevision": "e2ea192b4e85841e1fa6923606fa284af50dd7b6",
-          "releaseTag": "ubuntu26/20261026.180",
-          "inventoryHash": "sha256:1a50308abd77dd08e0169dfe1a52d7830b21ed0c307e33724500dc635ef53ce2",
-          "configurationRepair": null,
-          "digest": "sha256:55ebb989d86b9601c5b81a53fdb205b7ca5b9923f17a07c3a2c7af5495c8ce32",
-          "ref": "ghcr.io/delinoio/actions-runner-images@sha256:55ebb989d86b9601c5b81a53fdb205b7ca5b9923f17a07c3a2c7af5495c8ce32",
-          "tag": "ubuntu26-20261026.180.1-9024c08210d7-40806758172-1",
-          "publishedAt": "2026-10-29T03:57:16.906Z",
-          "validation": {
-            "digest": "sha256:55ebb989d86b9601c5b81a53fdb205b7ca5b9923f17a07c3a2c7af5495c8ce32",
-            "verifiedAt": "2026-10-29T03:57:02.634Z",
-            "softwareInventory": "passed",
-            "aptInventory": "passed",
-            "sandboxCompilation": "passed"
-          },
-          "layers": [
-            {
-              "digest": "sha256:fcaa60bffbb9125f46a61ab1058614e8a2547ea91372d4970d51c27e045102d5",
-              "size": 795304322,
-              "uncompressed": 1636925440
-            },
-            {
-              "digest": "sha256:acf1e92fc90ff737e565537462670b1026e4f16b6fb0ea5d62f5cfb5d0b65de8",
-              "size": 929180987,
-              "uncompressed": 2071162880
-            },
-            {
-              "digest": "sha256:2ea0429ebb17af0c9af8e590cc47d3dc1fa789cf2263f8a7ae1e5fdb04fefe2d",
-              "size": 891831763,
-              "uncompressed": 2010050560
-            },
-            {
-              "digest": "sha256:5401cb484178f75c0e41439a5e2e7c2b8fb18f347a4eb686dcd9bcf95f66696e",
-              "size": 680206683,
-              "uncompressed": 1942384640
-            },
-            {
-              "digest": "sha256:5929f0ceb872d4cb18eed07b2e1444a95fd42ab91b686bd5bdd4baf0c25b9cd6",
-              "size": 594435047,
-              "uncompressed": 1622497280
-            },
-            {
-              "digest": "sha256:362905b0904c08dcf6e8913ecfc78fa88764743d97e4a6e629dbc9fe34a30031",
-              "size": 1196761808,
-              "uncompressed": 2041600000
-            },
-            {
-              "digest": "sha256:4dae8dbdfcb3d394ad55199b1385955bd623b62e5bf415e1611eb6713c506073",
-              "size": 736929370,
-              "uncompressed": 2054082560
-            },
-            {
-              "digest": "sha256:c37a7a5fd66dff48a0d8b2558824cdeb33f921847b9d95180f845b83f23c67ab",
-              "size": 847882699,
-              "uncompressed": 1976494080
-            },
-            {
-              "digest": "sha256:36a4345eb907dcfaf854e9aee0ae4017dfccbdfcb921803d2c809fa830a85179",
-              "size": 704892320,
-              "uncompressed": 2132039680
-            },
-            {
-              "digest": "sha256:0d3178577a2c333c6ed9734022478e753bc8cdbbaad9b15c6c45cdd39e6bd864",
-              "size": 806788617,
-              "uncompressed": 2071511040
-            },
-            {
-              "digest": "sha256:05006b48367f73ed950a29128bbd93e2ca5b2d2885ea9e0ffc67f784ee8c4f71",
-              "size": 542044208,
-              "uncompressed": 1834967040
-            },
-            {
-              "digest": "sha256:3d9884708fe4eb80355b0ddf3cc5cc70fc85ce09e8a6d4dea9f82baced779371",
-              "size": 453411330,
-              "uncompressed": 2135664640
-            },
-            {
-              "digest": "sha256:140d9ccc188a14cf91eeefc7b3846cdef68d61f8a52d99dbf8872f2077c9b781",
-              "size": 671752667,
-              "uncompressed": 2094970880
-            },
-            {
-              "digest": "sha256:760c5918b3cd4a2be8b089c85a4be4d1b149d421c8f1ca229e608020367e41dd",
-              "size": 1198060085,
-              "uncompressed": 2072074240
-            },
-            {
-              "digest": "sha256:191765ef00b2ed28ac7285bae562ddb724fd7a2cd7ab0950ebc6fb22c3775493",
-              "size": 763378122,
-              "uncompressed": 2118952960
-            },
-            {
-              "digest": "sha256:1eccb159118ae94b691020d48b8585341b8cbb02c8a2f886f0de4695ce1a902b",
-              "size": 745158823,
-              "uncompressed": 2140323840
-            },
-            {
-              "digest": "sha256:63c7d73c36865705b0ac4236319dc9d4125d6b3125cebd65e6b61ee8b6ee195c",
-              "size": 731833981,
-              "uncompressed": 2109491200
-            },
-            {
-              "digest": "sha256:e224e9edb435b9fb0b6588ce5d411a8d14ffaa9b157b9652596af3ecda7a9380",
-              "size": 815030662,
-              "uncompressed": 1842042880
-            },
-            {
-              "digest": "sha256:e9e846e937218209c427169bc955e8011f37c52b63605ecb6196cc56f35219c6",
-              "size": 637089963,
-              "uncompressed": 1448990720
-            },
-            {
-              "digest": "sha256:908d21113a96769181f326b072fc93353b3ae0e19ebe7602855b883e2f98c07d",
-              "size": 523222559,
-              "uncompressed": 2119198720
-            },
-            {
-              "digest": "sha256:03d2166e9ac3fdd934ca357cdf15fe7bf613e8ff167402143222b53c1cd7e5f7",
-              "size": 653389819,
-              "uncompressed": 2046269440
-            },
-            {
-              "digest": "sha256:2ce4e93fa1fdc9395567ab28a4b04c746eab4e63cb9279c00fa84b3916c33757",
-              "size": 864882646,
-              "uncompressed": 2094653440
-            },
-            {
-              "digest": "sha256:822d6fe5f0ec04c6c710c58b44af7e0388dbaf548d8fe64757d2df4ab3ea7e33",
-              "size": 854939020,
-              "uncompressed": 2097909760
-            },
-            {
-              "digest": "sha256:7782dbed3792849b532f6438467a3edaafd7cf0cc61a76980fc8dd5afb40a3a9",
-              "size": 1024754544,
-              "uncompressed": 1982259200
-            },
-            {
-              "digest": "sha256:c9a4f6b83d43fb45617e511d8816f1fa914f21055bccec563f7d701a2a3e7cca",
-              "size": 695040296,
-              "uncompressed": 2124523520
-            },
-            {
-              "digest": "sha256:ba74ccab05c420a598cafda126da254e551953b4b5b354b918c2ce996deb674a",
-              "size": 546586288,
-              "uncompressed": 1854648320
-            },
-            {
-              "digest": "sha256:da2a7399defd280a26ff4f30164d1ccf946d46699835731f3062cc359578491e",
-              "size": 54456,
-              "uncompressed": 286720
-            }
-          ]
         }
       ],
       "lastCheck": {
-        "checkedAt": "2026-11-27T02:29:48.588Z",
-        "status": "unchanged",
-        "imageVersion": "20261116.202.1",
+        "checkedAt": "2026-11-28T02:28:56.677Z",
+        "status": "published",
+        "imageVersion": "20261122.9.1",
         "recipeRevision": "79e3900d701b57058a841935c943db23e095fc94",
-        "sourceRevision": "3556d77480d4ddcea99344ba63343bc623f81e59",
-        "docsRevision": "defaed523ed759d372cf758620ba2908d434c3be",
+        "sourceRevision": "5a6c8c9684029934a7260368a01f4787a4289bc3",
+        "docsRevision": "1ede08b87c78b9a8871f4761a20f9b5fd94796c4",
         "code": null,
         "latestError": null,
         "maintenanceError": null
